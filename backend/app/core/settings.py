@@ -38,43 +38,29 @@ class RedisSettings(BaseSettings):
     def redis_url(self):
         return f"redis://:{self.redis_pass.get_secret_value()}@{self.redis_host}:{self.redis_port}/{self.redis_db}"
 
+
+class RabbitMQSettings(BaseSettings):
+    rabbitmq_user: str
+    rabbitmq_password: SecretStr
+
     @property
     def celery_url(self):
-        return f"redis://:{self.redis_pass.get_secret_value()}@{self.redis_host}:{self.redis_port}/{self.celery_db}"
+        return f"amqp://{self.rabbitmq_user}:{self.rabbitmq_password.get_secret_value()}@rabbitmq:5672/"
 
     @property
     def celery_back_url(self):
-        return f"redis://:{self.redis_pass.get_secret_value()}@{self.redis_host}:{self.redis_port}/{self.celery_back_db}"
-
-
-class S3Settings(BaseSettings):
-    access_key: str
-    secret_key: SecretStr
-    endpoint_url: str
-    bucket1: str
-    bucket2: str
-
-    model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf8", extra="ignore")
-
-
-class EmailSettings(BaseSettings):
-    email_host: str
-    email_port: int
-    email_username: str
-    email_password: SecretStr
-
-    model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf8", extra="ignore")
+        return "rpc://"
 
 
 class Settings(BaseSettings):
     db_settings: DBSettings = DBSettings()
     jwt_settings: JWTSettings = JWTSettings()
     redis_settings: RedisSettings = RedisSettings()
-    s3_settings: S3Settings = S3Settings()
-    email_settings: EmailSettings = EmailSettings()
+    rbmq: RabbitMQSettings = RabbitMQSettings()
 
     default_avatar_url: str
     frontend_url: str
+    bot_token: SecretStr
 
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf8", extra="ignore")
 

@@ -1,0 +1,5 @@
+aiogram
+aio_pika
+dotenv
+aiohttp
+redis
