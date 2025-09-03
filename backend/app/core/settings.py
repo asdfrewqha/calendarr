@@ -29,8 +29,6 @@ class RedisSettings(BaseSettings):
     redis_host: str
     redis_port: int
     redis_db: int
-    celery_db: int
-    celery_back_db: int
 
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf8", extra="ignore")
 
@@ -58,7 +56,6 @@ class Settings(BaseSettings):
     redis_settings: RedisSettings = RedisSettings()
     rbmq: RabbitMQSettings = RabbitMQSettings()
 
-    default_avatar_url: str
     frontend_url: str
     bot_token: SecretStr
 
