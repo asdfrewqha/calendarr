@@ -28,14 +28,26 @@ services:
     networks:
       - backend_net
   rabbitmq:
-    image: rabbitmq:latest
-    container_name: rabbit-container
+    image: rabbitmq:3-alpine
+    container_name: rabbitmq-container
     ports:
       - "5672:5672"
-      - "15672:15672"
     environment:
-      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER}
-      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD}
+      - RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER}
+      - RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD}
+      - RABBITMQ_VM_MEMORY_HIGH_WATERMARK=256MB
+      - RABBITMQ_SERVER_ADDITIONAL_ERL_ARGS=+Mi true
+    mem_limit: 512m
+    cpus: 0.5
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    restart: unless-stopped
+    command: >
+      bash -c "
+      echo 'vm_memory_high_watermark.relative = 0.4' >> /etc/rabbitmq/rabbitmq.conf &&
+      echo 'vm_memory_high_watermark_paging_ratio = 0.5' >> /etc/rabbitmq/rabbitmq.conf &&
+      docker-entrypoint.sh rabbitmq-server
+      "
     healthcheck:
       test: ["CMD", "rabbitmq-diagnostics", "ping"]
       interval: 5s
