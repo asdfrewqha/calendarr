@@ -1,7 +1,7 @@
 from pydantic import BaseModel, ConfigDict
 from datetime import datetime, date
 from typing import Optional
-from database.utils import MessageType
+from app.database.utils import MessageType
 from uuid import UUID
 
 
