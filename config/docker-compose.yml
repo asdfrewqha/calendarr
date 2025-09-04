@@ -16,6 +16,10 @@ services:
     restart: unless-stopped
     ports:
       - "${DB_PORT:-5432}:5432"
+    deploy:
+      resources:
+        limits:
+          memory: 150m
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
       interval: 5s
@@ -33,9 +37,15 @@ services:
       redis-server
       --requirepass ${REDIS_PASS}
       --bind 0.0.0.0
+      --maxmemory 80mb
+      --maxmemory-policy allkeys-lru
     restart: unless-stopped
     ports:
       - "${REDIS_PORT:-6379}:6379"
+    deploy:
+      resources:
+        limits:
+          memory: 100m
     healthcheck:
       test: ["CMD", "redis-cli", "-a", "${REDIS_PASS}", "ping"]
       interval: 5s
