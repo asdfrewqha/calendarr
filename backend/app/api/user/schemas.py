@@ -17,7 +17,7 @@ class UserProfileResponse(BaseModel):
 class MessageCreateScheme(BaseModel):
     user_id: Optional[int] = None
     name: Optional[str] = None
-    text: Optional[str] = None
+    payload: Optional[dict] = None
     start_date: Optional[datetime] = None
     end_date: datetime
     type: MessageType
@@ -37,7 +37,7 @@ class ListRequestScheme(BaseModel):
 class MessageScheme(BaseModel):
     user_id: Optional[int] = None
     name: Optional[str] = None
-    text: Optional[str] = None
+    payload: Optional[dict] = None
     start_date: Optional[datetime] = None
     end_date: datetime
     type: MessageType
@@ -47,7 +47,7 @@ class MessageScheme(BaseModel):
 
 class MessageUpdateScheme(BaseModel):
     name: Optional[str] = None
-    text: Optional[str] = None
+    payload: Optional[dict] = None
     start_date: Optional[datetime] = None
     end_date: Optional[datetime] = None
     type: Optional[MessageType] = None
