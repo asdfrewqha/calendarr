@@ -11,7 +11,7 @@ from typing import Annotated, List, Optional
 router = APIRouter()
 
 
-@router.get("/create-msg", response_model=List[Optional[MessageScheme]])
+@router.get("/list-msg", response_model=List[Optional[MessageScheme]])
 async def create_message(
     dates: ListRequestScheme,
     user: Annotated[User, Depends(check_user_token)],
