@@ -1,7 +1,7 @@
 import inflect
 from datetime import datetime
 
-from sqlalchemy import String, BigInteger, DateTime, Boolean, Enum, Integer
+from sqlalchemy import String, BigInteger, DateTime, Boolean, Enum, Integer, ARRAY
 from sqlalchemy.orm import Mapped, mapped_column, declarative_base, declared_attr
 from sqlalchemy.dialects.postgresql import JSONB
 
@@ -37,3 +37,6 @@ class Message(IDMixin, TimestampsMixin, Base):
     type: Mapped[MessageType] = mapped_column(Enum(MessageType), default=MessageType.TEXT)
     notification: Mapped[bool] = mapped_column(Boolean, default=True)
     priority: Mapped[int] = mapped_column(Integer)
+    repeat: Mapped[bool] = mapped_column(Boolean)
+    repeat_date: Mapped[datetime] = mapped_column(DateTime, nullable=True)
+    repeat_wd: Mapped[list] = mapped_column(ARRAY, nullable=True)
