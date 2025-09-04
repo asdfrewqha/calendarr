@@ -39,13 +39,12 @@ services:
     cpus: 0.5
     volumes:
       - rabbitmq_data:/var/lib/rabbitmq
-      - ./rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf:ro
     restart: unless-stopped
     command: >
-      bash -c "
-      echo 'vm_memory_high_watermark.relative = 0.4' >> /etc/rabbitmq/rabbitmq.conf &&
+      sh -c "
+      echo 'vm_memory_high_watermark.relative = 0.4' > /etc/rabbitmq/rabbitmq.conf &&
       echo 'vm_memory_high_watermark_paging_ratio = 0.5' >> /etc/rabbitmq/rabbitmq.conf &&
-      docker-entrypoint.sh rabbitmq-server
+      exec docker-entrypoint.sh rabbitmq-server
       "
     healthcheck:
       test: ["CMD", "rabbitmq-diagnostics", "ping"]
@@ -112,7 +111,7 @@ services:
     image: asdfrewqha/calendar_bot:latest 
     container_name: aiobot-container
     env_file:
-      - .env
+      - /root/fastapi/env
     depends_on:
       rabbitmq:
         condition: service_healthy
