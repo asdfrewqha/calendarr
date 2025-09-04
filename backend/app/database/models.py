@@ -1,11 +1,12 @@
 import inflect
 from datetime import datetime
 
-from sqlalchemy import String, Text, BigInteger, DateTime, Boolean
+from sqlalchemy import String, Text, BigInteger, DateTime, Boolean, Enum, Integer
 from sqlalchemy.orm import Mapped, mapped_column, declarative_base, declared_attr
 
 from app.database.mixins.id_mixins import IDMixin
 from app.database.mixins.timestamp_mixins import TimestampsMixin
+from app.database.utils import MessageType
 
 p = inflect.engine()
 
@@ -27,5 +28,11 @@ class User(TimestampsMixin, Base):
 
 
 class Message(IDMixin, TimestampsMixin, Base):
-    text: Mapped[str] = mapped_column(Text)
-    send_at: Mapped[datetime] = mapped_column(DateTime)
+    user_id: Mapped[int] = mapped_column(BigInteger)
+    name: Mapped[str] = mapped_column(String, nullable=True)
+    text: Mapped[str] = mapped_column(Text, nullable=True)
+    start_send_date: Mapped[datetime] = mapped_column(DateTime, nullable=True)
+    end_send_date: Mapped[datetime] = mapped_column(DateTime)
+    type: Mapped[MessageType] = mapped_column(Enum(MessageType), default=MessageType.TEXT)
+    notification: Mapped[bool] = mapped_column(Boolean, default=True)
+    priority: Mapped[int] = mapped_column(Integer)
