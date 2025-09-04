@@ -111,7 +111,7 @@ services:
     image: asdfrewqha/calendar_bot:latest 
     container_name: aiobot-container
     env_file:
-      - /root/fastapi/env
+      - /root/fastapi/.env
     depends_on:
       rabbitmq:
         condition: service_healthy
