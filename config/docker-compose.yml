@@ -27,7 +27,22 @@ services:
       retries: 5
     networks:
       - backend_net
-
+  rabbitmq:
+    image: rabbitmq:latest
+    container_name: rabbit-container
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD}
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - backend_net
   redis:
     image: redis:7-alpine
     container_name: redis-container
@@ -76,13 +91,24 @@ services:
     container_name: celery-container
     env_file:
       - /root/fastapi/.env
-    command: celery -A app.core.celery_config:celery_app worker --loglevel=info -P solo
+    command: celery -A app.core.celery_config:app worker --loglevel=info -P solo
     depends_on:
       redis:
         condition: service_healthy
     networks:
       - backend_net
-
+  aiobot:
+    build:
+      context: ../bot
+    container_name: aiobot-container
+    env_file:
+      - .env
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    networks:
+      - backend_net
+    restart: always
   nginx:
     image: nginx:alpine
     container_name: nginx-container
