@@ -36,7 +36,6 @@ services:
       - RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER}
       - RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD}
       - RABBITMQ_VM_MEMORY_HIGH_WATERMARK=256MB
-      - RABBITMQ_SERVER_ADDITIONAL_ERL_ARGS=+Mi true
     mem_limit: 512m
     cpus: 0.5
     volumes:
@@ -145,3 +144,4 @@ networks:
 volumes:
   postgres_data:
   redis_data:
+  rabbitmq_data:
