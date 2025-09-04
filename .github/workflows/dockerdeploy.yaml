@@ -75,13 +75,20 @@ jobs:
             BOT_TOKEN: "${{ secrets.TELEGRAM_BOT_TOKEN }}"
             USER_IDS: "${{ secrets.TELEGRAM_CHAT_ID }}"
           run: |
+            set +e
             MESSAGE="Deploy starting"
             for USER_ID in $USER_IDS; do
-                curl -s -X POST "https://api.telegram.org/bot${BOT_TOKEN}/sendMessage" \
+              echo "Sending to $USER_ID"
+              RESPONSE=$(curl -s -o /dev/null -w "%{http_code}" \
+                -X POST "https://api.telegram.org/bot${BOT_TOKEN}/sendMessage" \
                 -d chat_id="$USER_ID" \
-                -d text="$MESSAGE"
+                -d text="$MESSAGE")
+              if [ "$RESPONSE" -ne 200 ]; then
+                echo "⚠️ Telegram API returned HTTP $RESPONSE"
+              fi
             done
-        
+            set -e
+
         - name: Archive docker-compose.yml and nginx.conf
           run: |
             ls
