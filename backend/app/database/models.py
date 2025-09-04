@@ -39,4 +39,4 @@ class Message(IDMixin, TimestampsMixin, Base):
     priority: Mapped[int] = mapped_column(Integer)
     repeat: Mapped[bool] = mapped_column(Boolean)
     repeat_date: Mapped[datetime] = mapped_column(DateTime, nullable=True)
-    repeat_wd: Mapped[list] = mapped_column(ARRAY, nullable=True)
+    repeat_wd: Mapped[list] = mapped_column(ARRAY(Integer), nullable=True)
