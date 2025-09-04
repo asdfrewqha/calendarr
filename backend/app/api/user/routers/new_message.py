@@ -4,6 +4,7 @@ from app.database.adapter import adapter
 from app.database.models import Message, User
 from app.database.session import get_async_session
 from app.api.user.schemas import MessageCreateScheme, CreatedMessageResponse
+from app.api.user.tasks import schedule_telegram_message
 from app.dependencies.checks import check_user_token
 from typing import Annotated
 
@@ -19,4 +20,5 @@ async def create_message(
     msg.user_id = user.id
     msg_dict = MessageCreateScheme.model_dump(msg)
     new_msg = await adapter.insert(Message, msg_dict, session)
+    schedule_telegram_message(user.id, new_msg.id)
     return CreatedMessageResponse(id=new_msg.id)

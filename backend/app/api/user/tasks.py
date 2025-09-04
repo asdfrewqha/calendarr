@@ -17,8 +17,8 @@ async def publish_message(message: dict):
 
 
 @app.task
-def schedule_telegram_message(chat_id: int, text: str, msg_id: UUID):
-    asyncio.run(publish_message({"chat_id": chat_id, "text": text, "msg_id": str(msg_id)}))
+def schedule_telegram_message(chat_id: int, msg_id: UUID):
+    asyncio.run(publish_message({"chat_id": chat_id, "msg_id": str(msg_id)}))
 
 
 @app.task

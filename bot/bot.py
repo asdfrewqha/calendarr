@@ -6,7 +6,7 @@ from uuid import UUID
 import aio_pika
 from aiogram.types import BotCommand
 from core.config import RABBITMQ_URL
-from core.dp import bot, dp, send_message
+from core.dp import bot, dp, send_md_message
 from utils.api_dependencies import check_notifications
 
 logger = logging.getLogger(__name__)
@@ -16,12 +16,23 @@ async def on_message(message: aio_pika.IncomingMessage):
     async with message.process():
         data = json.loads(message.body)
         chat_id = data["chat_id"]
-        text = data["text"]
         msg_id = data.get("msg_id")
 
-        send = await check_notifications(chat_id=chat_id, msg_id=UUID(msg_id))
-        if send:
-            await send_message(chat_id=chat_id, text=text)
+        payload = await check_notifications(chat_id=chat_id, msg_id=UUID(msg_id))
+        if payload:
+            if payload.get("text"):
+                text = f'*{payload.get("name")}*\n\nВаше напоминание\nПриоритет: {payload["priority"]}\nСообщение:\n{payload["text"]}'
+            elif payload.get(0):
+                values = payload.values()
+                message = ""
+                for value in values:
+                    message = message + value + "\n"
+                text = f'*{payload.get("name")}*\n\nВаше напоминание\nПриоритет: {payload["priority"]}\nСписок:\n{message}'
+            elif payload.get("name"):
+                text = f'*{payload.get("name")}*\n\nВаше напоминание\nПриоритет: {payload["priority"]}'
+            else:
+                text = f'Ваше напоминание с приоритетом: {payload["priority"]}'
+            await send_md_message(chat_id=chat_id, text=text)
 
 
 async def connect_with_retry(url, retries=10, delay=5):

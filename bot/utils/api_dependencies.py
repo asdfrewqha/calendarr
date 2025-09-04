@@ -47,6 +47,6 @@ async def check_notifications(chat_id: int, msg_id: UUID):
             f"{BACKEND_URL}/check-notific/{msg_id}", headers={"Authorization": f"Bearer {token}"}
         ) as resp:
             if resp.status == 200:
-                return True
+                return await resp.json()
             else:
                 return False

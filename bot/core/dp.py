@@ -13,3 +13,7 @@ dp.include_router(router)
 
 async def send_message(chat_id: int, text: str):
     await bot.send_message(chat_id=chat_id, text=text)
+
+
+async def send_md_message(chat_id: int, text: str):
+    await bot.send_message(chat_id=chat_id, text=text, parse_mode="MarkdownV2", disable_web_page_preview=True)
