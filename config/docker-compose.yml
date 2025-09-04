@@ -35,11 +35,11 @@ services:
     environment:
       RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER}
       RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD}
-      RABBITMQ_VM_MEMORY_HIGH_WATERMARK: 256MB
-    mem_limit: 512m
+    mem_limit: 768m
     cpus: 0.5
     volumes:
       - rabbitmq_data:/var/lib/rabbitmq
+      - ./rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf:ro
     restart: unless-stopped
     command: >
       bash -c "
