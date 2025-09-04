@@ -87,7 +87,7 @@ jobs:
         - name: Archive docker-compose.yml and nginx.conf
           run: |
             ls
-            tar -czf deploy.tar.gz -C config docker-compose.yml nginx.conf postgres.conf
+            tar -czf deploy.tar.gz -C config docker-compose.yml nginx.conf postgres.conf rabbitmq.conf
 
         - name: Copy archive to server
           uses: appleboy/scp-action@v0.1.0
