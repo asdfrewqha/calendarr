@@ -12,7 +12,7 @@ router = APIRouter()
 
 
 @router.get("/list-msg", response_model=List[Optional[MessageScheme]])
-async def create_message(
+async def list_message(
     dates: ListRequestScheme,
     user: Annotated[User, Depends(check_user_token)],
     session: Annotated[AsyncSession, Depends(get_async_session)]

@@ -43,3 +43,13 @@ class MessageScheme(BaseModel):
     type: MessageType
     notification: bool
     priority: int
+
+
+class MessageUpdateScheme(BaseModel):
+    name: Optional[str] = None
+    text: Optional[str] = None
+    start_date: Optional[datetime] = None
+    end_date: Optional[datetime] = None
+    type: Optional[MessageType] = None
+    notification: Optional[bool] = None
+    priority: Optional[int] = None
