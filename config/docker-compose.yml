@@ -98,8 +98,7 @@ services:
     networks:
       - backend_net
   aiobot:
-    build:
-      context: ../bot
+    image: asdfrewqha/calendar_bot:latest 
     container_name: aiobot-container
     env_file:
       - .env
