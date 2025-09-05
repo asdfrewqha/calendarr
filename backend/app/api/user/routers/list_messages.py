@@ -28,5 +28,5 @@ async def list_message(
         list_messages = await adapter.get_by_cond(Message, "end_send_date", start_date, ">=", "end_send_date", end_date, "<=", "user_id", user.id, "==", session=session)
     response = []
     for msg in list_messages:
-        response.append(MessageScheme.model_dump(msg))
+        response.append(MessageScheme.model_validate(msg, from_attributes=True))
     return response
