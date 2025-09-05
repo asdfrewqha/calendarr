@@ -54,18 +54,18 @@ export default function App() {
           }
           return res.json();
         })
-        .then((res) => {
-          if (res.ok) {
+        .then((data) => {
+          if (data.ok) {
             setSuccess(true);
             setTimeout(() => {
-              window.location.href = '/main';
+              window.location.href = '/#/main';
             }, 2000);
           } else {
             setError('Ошибка авторизации');
           }
           setLoading(false);
         })
-        .catch((error) => {
+        .catch(() => {
           setError('Не удалось получить токены');
           setLoading(false);
         });
