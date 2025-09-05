@@ -38,6 +38,7 @@ class MessageScheme(BaseModel):
     payload: Optional[dict] = None
     start_send_date: Optional[datetime] = None
     end_send_date: datetime
+    is_active: bool = True
     type: MessageType
     notification: bool
     priority: int

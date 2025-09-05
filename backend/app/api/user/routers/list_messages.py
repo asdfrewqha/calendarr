@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, Query
-from datetime import datetime, time, date
+from datetime import datetime, time, date, timezone
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.database.adapter import adapter
 from app.database.models import Message, User
@@ -28,5 +28,8 @@ async def list_message(
         list_messages = await adapter.get_by_cond(Message, "end_send_date", start_date, ">=", "end_send_date", end_date, "<=", "user_id", user.id, "==", session=session)
     response = []
     for msg in list_messages:
-        response.append(MessageScheme.model_validate(msg, from_attributes=True))
+        msg_sch = MessageScheme.model_validate(msg, from_attributes=True)
+        if end_date < datetime.now(timezone.utc):
+            msg_sch.is_active = False
+        response.append(msg_sch)
     return response
