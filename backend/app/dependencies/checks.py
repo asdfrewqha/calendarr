@@ -1,5 +1,4 @@
 from typing import Annotated, Dict, Literal
-from uuid import UUID
 
 from app.utils.token_manager import TokenManager
 from app.utils.cookies import get_tokens_cookies
@@ -20,7 +19,7 @@ async def check_user_token(
     session: Annotated[AsyncSession, Depends(get_async_session)],
 ) -> User:
     data = TokenManager.decode_token(tokens["access"])
-    user = await adapter.get_by_id(User, UUID(data["sub"]), session=session)
+    user = await adapter.get_by_id(User, int(data["sub"]), session=session)
     if user:
         return user
 
@@ -33,7 +32,7 @@ async def check_refresh(
     session: Annotated[AsyncSession, Depends(get_async_session)],
 ) -> User:
     data = TokenManager.decode_token(tokens["refresh"], access=False)
-    user = await adapter.get_by_id(User, UUID(data["sub"]), session=session)
+    user = await adapter.get_by_id(User, int(data["sub"]), session=session)
     if user:
         return user
 

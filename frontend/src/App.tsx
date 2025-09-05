@@ -13,6 +13,11 @@ interface TelegramUser {
   photo_url: string;
 }
 
+interface ApiResponse {
+  status: string;
+  message?: string;
+}
+
 declare global {
   interface Window {
     Telegram: {
@@ -31,48 +36,65 @@ export default function App() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+  const [debugInfo, setDebugInfo] = useState<string>('');
 
   useEffect(() => {
-    if (window.Telegram && window.Telegram.WebApp) {
+    const authenticate = async () => {
+      // Проверяем, инициализирован ли Telegram WebApp
+      if (!window.Telegram?.WebApp) {
+        setError('Telegram Web App не инициализирован');
+        setLoading(false);
+        setDebugInfo('Объект Telegram не найден в window. Откройте приложение через Telegram.');
+        return;
+      }
+
       const tg = window.Telegram.WebApp;
       tg.ready();
 
       const formData = new URLSearchParams();
       formData.append('initData', tg.initData);
 
-      fetch('https://api.asdfrewqha.ru/api/get-token', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: formData,
-        credentials: 'include'
-      })
-        .then((res) => {
-          if (!res.ok) {
-            throw new Error('Ошибка сервера');
-          }
-          return res.json();
-        })
-        .then((data) => {
-          if (data.ok) {
-            setSuccess(true);
-            setTimeout(() => {
-              window.location.href = '/#/main';
-            }, 2000);
-          } else {
-            setError('Ошибка авторизации');
-          }
-          setLoading(false);
-        })
-        .catch(() => {
-          setError('Не удалось получить токены');
-          setLoading(false);
+      try {
+        const response = await fetch('https://api.asdfrewqha.ru/api/get-token', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          body: formData,
+          credentials: 'include'
         });
-    } else {
-      setError('Telegram Web App не инициализирован');
-      setLoading(false);
-    }
+
+        // Сохраняем информацию для отладки
+        const responseText = await response.text();
+        setDebugInfo(`Status: ${response.status}, Response: ${responseText}`);
+        
+        let data: ApiResponse;
+        try {
+          data = JSON.parse(responseText);
+        } catch (e) {
+          throw new Error(`Неверный JSON-ответ: ${responseText}`);
+        }
+
+        console.log('Response data:', data);
+
+        // ИСПРАВЛЕНИЕ: проверяем поле status вместо ok
+        if (response.ok && data.status === "success") {
+          setSuccess(true);
+          setTimeout(() => {
+            window.location.href = '/#/main';
+          }, 2000);
+        } else {
+          setError(data.message || 'Ошибка авторизации: неверный ответ сервера');
+        }
+      } catch (err) {
+        console.error('Fetch error:', err);
+        setError(`Не удалось получить токены: ${err instanceof Error ? err.message : 'Unknown error'}`);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    authenticate();
   }, []);
 
   const openInTelegram = () => {
@@ -103,15 +125,26 @@ export default function App() {
             <div className="error-icon">⚠️</div>
             <h3>Ошибка аутентификации</h3>
             <p>{error}</p>
-            <button onClick={openInTelegram} className="telegram-btn">
-              📱 Открыть в Telegram
-            </button>
-            <button 
-              onClick={() => window.location.reload()} 
-              className="retry-btn"
-            >
-              🔄 Попробовать снова
-            </button>
+            
+            {/* Добавляем отладочную информацию */}
+            {debugInfo && (
+              <details className="debug-info">
+                <summary>Детали ошибки (для разработки)</summary>
+                <pre>{debugInfo}</pre>
+              </details>
+            )}
+            
+            <div className="button-group">
+              <button onClick={openInTelegram} className="telegram-btn">
+                📱 Открыть в Telegram
+              </button>
+              <button 
+                onClick={() => window.location.reload()} 
+                className="retry-btn"
+              >
+                🔄 Попробовать снова
+              </button>
+            </div>
           </div>
         </main>
       </div>
@@ -138,17 +171,5 @@ export default function App() {
     );
   }
 
-  return (
-    <div className="app">
-      <header className="app-header">
-        <h1>Telegram Web App</h1>
-        <p>Аутентификация через Telegram</p>
-      </header>
-      <main className="app-main">
-        <div className="info-container">
-          <p>Загрузка приложения...</p>
-        </div>
-      </main>
-    </div>
-  );
+  return null;
 }
