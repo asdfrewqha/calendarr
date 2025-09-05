@@ -19,17 +19,20 @@ async def list_message(
     end_date: Optional[date] = Query(None)
 ):
     if start_date:
-        start_date = datetime.combine(start_date, time())
+        start_date = datetime.combine(start_date, time()).replace(tzinfo=timezone.utc)
     if end_date:
-        end_date = datetime.combine(end_date, time(23, 59, 59))
+        end_date = datetime.combine(end_date, time(23, 59, 59)).replace(tzinfo=timezone.utc)
         list_messages = await adapter.get_by_cond(Message, "end_send_date", start_date, ">=", "end_send_date", end_date, "<=", "user_id", user.id, "==", session=session)
     else:
-        end_date = datetime.combine(start_date, time(23, 59, 59))
+        end_date = datetime.combine(start_date, time(23, 59, 59)).replace(tzinfo=timezone.utc)
         list_messages = await adapter.get_by_cond(Message, "end_send_date", start_date, ">=", "end_send_date", end_date, "<=", "user_id", user.id, "==", session=session)
     response = []
+    current_time = datetime.now(timezone.utc)
+
     for msg in list_messages:
         msg_sch = MessageScheme.model_validate(msg, from_attributes=True)
-        if end_date < datetime.now(timezone.utc):
+        if end_date < current_time:
             msg_sch.is_active = False
         response.append(msg_sch)
+
     return response
