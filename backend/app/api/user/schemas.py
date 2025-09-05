@@ -1,5 +1,5 @@
 from pydantic import BaseModel, ConfigDict
-from datetime import datetime, date
+from datetime import datetime
 from typing import Optional
 from app.database.utils import MessageType
 from uuid import UUID
@@ -9,7 +9,7 @@ class UserProfileResponse(BaseModel):
     id: int
     username: str
     name: str
-    notification_bool: bool
+    notifications_bool: bool
 
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
@@ -30,11 +30,6 @@ class MessageCreateScheme(BaseModel):
 
 class CreatedMessageResponse(BaseModel):
     id: UUID
-
-
-class ListRequestScheme(BaseModel):
-    start_date: date
-    end_date: Optional[date] = None
 
 
 class MessageScheme(BaseModel):

@@ -10,7 +10,7 @@ dp.include_router(router)
 
 
 def escape_markdown(text: str) -> str:
-    escape_chars = r'[_*\[\]()~`>#+\-=|{}.!]'
+    escape_chars = r'[_\[\]()~`>#+\-=|{}.!]'
     return re.sub(f'({escape_chars})', r'\\\1', text)
 
 
