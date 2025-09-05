@@ -1,79 +1,76 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import './App.css';
 
-interface AuthResponse {
-  message: string;
-  status: string;
+interface TelegramUser {
+  id: number;
+  first_name: string;
+  last_name: string;
+  username: string;
+  language_code: string;
+  is_premium: boolean;
+  added_to_attachment_menu: boolean;
+  allows_write_to_pm: boolean;
+  photo_url: string;
 }
 
-function App() {
+declare global {
+  interface Window {
+    Telegram: {
+      WebApp: {
+        ready: () => void;
+        initDataUnsafe: {
+          user: TelegramUser;
+        };
+        initData: string;
+      };
+    };
+  }
+}
+
+export default function App() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
 
-  const getInitData = () => {
-    const urlParams = new URLSearchParams(window.location.search);
-    return urlParams.get('tgWebAppData');
-  };
+  useEffect(() => {
+    if (window.Telegram && window.Telegram.WebApp) {
+      const tg = window.Telegram.WebApp;
+      tg.ready();
 
-  const authenticateUser = async (initData: string) => {
-    try {
-      setLoading(true);
-      
-      const formData = new FormData();
-      formData.append('initData', initData);
+      const formData = new URLSearchParams();
+      formData.append('initData', tg.initData);
 
-      const response = await fetch('https://api.asdfrewqha.ru/api/get-token', {
+      fetch('https://api.asdfrewqha.ru/api/get-token', {
         method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
         body: formData,
         credentials: 'include'
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || `Ошибка сервера: ${response.status}`);
-      }
-
-      const data: AuthResponse = await response.json();
-      
-      if (data.status === 'success') {
-        setSuccess(true);
-        setError(null);
-        
-        setTimeout(() => {
-          window.location.href = '/dashboard';
-        }, 2000);
-        
-      } else {
-        throw new Error(data.message || 'Неизвестная ошибка аутентификации');
-      }
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Неизвестная ошибка');
-      setSuccess(false);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const checkAuthStatus = () => {
-    const accessToken = document.cookie.includes('access_token');
-    const refreshToken = document.cookie.includes('refresh_token');
-    return accessToken && refreshToken;
-  };
-
-  useEffect(() => {
-    if (checkAuthStatus()) {
-      setSuccess(true);
-      setLoading(false);
-      return;
-    }
-
-    const initData = getInitData();
-    
-    if (initData) {
-      authenticateUser(initData);
+      })
+        .then((res) => {
+          if (!res.ok) {
+            throw new Error('Ошибка сервера');
+          }
+          return res.json();
+        })
+        .then((res) => {
+          if (res.ok) {
+            setSuccess(true);
+            setTimeout(() => {
+              window.location.href = '/main';
+            }, 2000);
+          } else {
+            setError('Ошибка авторизации');
+          }
+          setLoading(false);
+        })
+        .catch((error) => {
+          setError('Не удалось получить токены');
+          setLoading(false);
+        });
     } else {
-      setError('InitData не найден в URL. Откройте приложение через Telegram.');
+      setError('Telegram Web App не инициализирован');
       setLoading(false);
     }
   }, []);
@@ -94,15 +91,14 @@ function App() {
     );
   }
 
-  return (
-    <div className="app">
-      <header className="app-header">
-        <h1>Telegram Web App</h1>
-        <p>Аутентификация через Telegram</p>
-      </header>
-
-      <main className="app-main">
-        {error && (
+  if (error) {
+    return (
+      <div className="app">
+        <header className="app-header">
+          <h1>Telegram Web App</h1>
+          <p>Аутентификация через Telegram</p>
+        </header>
+        <main className="app-main">
           <div className="error-container">
             <div className="error-icon">⚠️</div>
             <h3>Ошибка аутентификации</h3>
@@ -117,9 +113,19 @@ function App() {
               🔄 Попробовать снова
             </button>
           </div>
-        )}
+        </main>
+      </div>
+    );
+  }
 
-        {success && (
+  if (success) {
+    return (
+      <div className="app">
+        <header className="app-header">
+          <h1>Telegram Web App</h1>
+          <p>Аутентификация через Telegram</p>
+        </header>
+        <main className="app-main">
           <div className="success-container">
             <div className="success-icon">✅</div>
             <h3>Аутентификация успешна!</h3>
@@ -127,20 +133,22 @@ function App() {
             <p>Перенаправление на главную страницу...</p>
             <div className="loading-spinner-small"></div>
           </div>
-        )}
+        </main>
+      </div>
+    );
+  }
 
-        {!error && !success && (
-          <div className="info-container">
-            <p>Загрузка приложения...</p>
-          </div>
-        )}
+  return (
+    <div className="app">
+      <header className="app-header">
+        <h1>Telegram Web App</h1>
+        <p>Аутентификация через Telegram</p>
+      </header>
+      <main className="app-main">
+        <div className="info-container">
+          <p>Загрузка приложения...</p>
+        </div>
       </main>
-
-      <footer className="app-footer">
-        <p>Secure authentication via Telegram</p>
-      </footer>
     </div>
   );
 }
-
-export default App;
