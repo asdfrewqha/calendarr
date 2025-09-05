@@ -6,7 +6,7 @@ from app.database.models import Message, User
 from app.database.session import get_async_session
 from app.api.user.schemas import MessageScheme
 from app.dependencies.checks import check_user_token
-from typing import Annotated
+from typing import Annotated, Optional
 
 router = APIRouter()
 
@@ -15,7 +15,7 @@ router = APIRouter()
 async def list_message(
     user: Annotated[User, Depends(check_user_token)],
     session: Annotated[AsyncSession, Depends(get_async_session)],
-    start_date: date = Query(None),
+    start_date: Optional[date] = Query(None),
     end_date: date = Query(...),
 ):
     start_date = datetime.combine(start_date, time())
