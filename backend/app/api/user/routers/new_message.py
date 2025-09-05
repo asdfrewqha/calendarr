@@ -21,6 +21,6 @@ async def create_message(
     msg_dict = MessageCreateScheme.model_dump(msg)
     new_msg = await adapter.insert(Message, msg_dict, session)
     schedule_telegram_message.apply_async(args=[user.id, new_msg.id], eta=msg.end_send_date)
-    if msg.start_date:
+    if msg.start_send_date:
         schedule_telegram_message.apply_async(args=[user.id, new_msg.id], eta=msg.start_send_date)
     return CreatedMessageResponse(id=new_msg.id)
