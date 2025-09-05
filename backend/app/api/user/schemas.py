@@ -56,6 +56,6 @@ class MessageUpdateScheme(BaseModel):
     type: Optional[MessageType] = None
     notification: Optional[bool] = None
     priority: Optional[int] = None
-    repeat: bool = None
+    repeat: bool = False
     repeat_date: Optional[datetime] = None
     repeat_wd: Optional[list] = None

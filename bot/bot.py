@@ -23,11 +23,13 @@ async def on_message(message: aio_pika.IncomingMessage):
             start = payload.get("start_notification")
             if payload.get("text"):
                 text = f'**{payload.get("name")}**\n\nВаше напоминание.\nПриоритет: {payload["priority"]}\nСообщение:\n{payload["text"]}\n{"Это первое напоминание." if start else ""}'
-            elif payload.get(0):
-                values = payload.values()
+            elif payload.get("array"):
+                array = payload.get("array")
                 message = ""
-                for value in values:
-                    message = message + value + "\n"
+                for arr in array:
+                    key, val = arr
+                    ind = "✅" if val else "❎"
+                    message = message + key + ": " + ind + "\n"
                 text = f'**{payload.get("name")}**\n\nВаше напоминание.\nПриоритет: {payload["priority"]}\nСписок:\n{message}\n{"Это первое напоминание." if start else ""}'
             elif payload.get("name"):
                 text = f'**{payload.get("name")}**\n\nВаше напоминание.\nПриоритет: {payload["priority"]}\n{"Это первое напоминание ." if start else ""}'
