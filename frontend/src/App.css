@@ -1,42 +1,168 @@
-#root {
-  max-width: 1280px;
+.app {
+  max-width: 500px;
   margin: 0 auto;
-  padding: 2rem;
+  padding: 20px;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+}
+
+.app-header {
   text-align: center;
+  margin-bottom: 30px;
+  padding: 20px 0;
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+.app-header h1 {
+  color: #0088cc;
+  margin-bottom: 10px;
+  font-size: 28px;
 }
 
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
+.app-header p {
+  color: #666;
+  font-size: 16px;
+}
+
+.app-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.loading-container {
+  text-align: center;
+  padding: 40px 20px;
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #0088cc;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 20px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.loading-container p {
+  color: #666;
+  font-size: 16px;
+}
+
+.error-container,
+.success-container,
+.info-container {
+  text-align: center;
+  padding: 30px;
+  background-color: #f8f9fa;
+  border-radius: 12px;
+  border: 1px solid #e9ecef;
+  margin-bottom: 20px;
+}
+
+.error-icon,
+.success-icon {
+  font-size: 48px;
+  margin-bottom: 15px;
+}
+
+.error-container h3 {
+  color: #dc3545;
+  margin-bottom: 10px;
+}
+
+.success-container h3 {
+  color: #28a745;
+  margin-bottom: 10px;
+}
+
+.error-container p,
+.success-container p {
+  color: #666;
+  margin-bottom: 20px;
+  line-height: 1.5;
+}
+
+.telegram-btn,
+.retry-btn {
+  padding: 12px 24px;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin: 5px;
+}
+
+.telegram-btn {
+  background-color: #0088cc;
+  color: white;
+}
+
+.telegram-btn:hover {
+  background-color: #006da3;
+  transform: translateY(-1px);
+}
+
+.retry-btn {
+  background-color: #6c757d;
+  color: white;
+}
+
+.retry-btn:hover {
+  background-color: #5a6268;
+  transform: translateY(-1px);
+}
+
+.loading-spinner-small {
+  width: 20px;
+  height: 20px;
+  border: 2px solid #f3f3f3;
+  border-top: 2px solid #28a745;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 15px auto;
+}
+
+.app-footer {
+  text-align: center;
+  margin-top: auto;
+  padding: 20px 0;
+  color: #666;
+  font-size: 14px;
+}
+
+.error-container,
+.success-container {
+  animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 480px) {
+  .app {
+    padding: 15px;
   }
-  to {
-    transform: rotate(360deg);
+  
+  .app-header h1 {
+    font-size: 24px;
   }
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
+  
+  .telegram-btn,
+  .retry-btn {
+    width: 100%;
+    margin: 5px 0;
   }
-}
-
-.card {
-  padding: 2em;
-}
-
-.read-the-docs {
-  color: #888;
 }
