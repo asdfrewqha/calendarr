@@ -1,12 +1,10 @@
 from aiogram import Bot, Dispatcher
-from aiogram.client.bot import DefaultBotProperties
 from aiogram.fsm.storage.memory import MemoryStorage
 from core.config import BOT_TOKEN
 from core.handlers import router
+from aiogram.utils.markdown import escape_md
 
-default_props = DefaultBotProperties(parse_mode="HTML")
-
-bot = Bot(token=BOT_TOKEN, default=default_props)
+bot = Bot(token=BOT_TOKEN)
 dp = Dispatcher(storage=MemoryStorage())
 dp.include_router(router)
 
@@ -16,4 +14,5 @@ async def send_message(chat_id: int, text: str):
 
 
 async def send_md_message(chat_id: int, text: str):
-    await bot.send_message(chat_id=chat_id, text=text, parse_mode="MarkdownV2", disable_web_page_preview=True)
+    escaped_text = escape_md(text)
+    await bot.send_message(chat_id=chat_id, text=escaped_text, parse_mode="MarkdownV2", disable_web_page_preview=True)
