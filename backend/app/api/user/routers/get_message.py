@@ -20,6 +20,11 @@ async def list_message(
 ):
     msg = await adapter.get_by_id(Message, msg_id, session)
     msg_sch = MessageScheme.model_validate(msg, from_attributes=True)
-    if msg.end_send_date > datetime.now(timezone.utc):
+    if msg.end_send_date:
+        msg_end_date = msg.end_send_date.replace(tzinfo=timezone.utc)
+        current_time = datetime.now(timezone.utc)
+        if msg_end_date < current_time:
+            msg_sch.is_active = False
+    else:
         msg_sch.is_active = False
-    return (msg_sch)
+    return msg_sch
