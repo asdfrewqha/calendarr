@@ -3,7 +3,7 @@ from enum import Enum
 
 class MessageType(Enum):
     TEXT = "TEXT"
-    NOTIFICATION = "NOTIF"
+    NOTIF = "NOTIFICATION"
     EVENT = "EVENT"
     TASK = "TASK"
     ARRAY = "ARRAY"

@@ -24,7 +24,7 @@ async def on_message(message: aio_pika.IncomingMessage):
         priority = payload.get("priority", "Unknown")
         name = payload.get("name")
 
-        header = f"<b>{name}</b>\n\n" if name else ""
+        header = f"<b>{name}</b>\n" if name else ""
         priority_text = f"Приоритет: {priority}\n"
         start_text = "Это первое напоминание.\n" if start else ""
 
