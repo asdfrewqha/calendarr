@@ -28,7 +28,7 @@ async def check_notifications(
         payload = msg.payload
         payload["name"] = msg.name
         payload["priority"] = msg.priority
-        payload["start_notification"] = True if msg.priority else False
+        payload["start_notification"] = True if msg.start_send_date else False
         if msg.repeat:
             if msg.repeat_date:
                 schedule_telegram_message.apply_async(args=[user.id, msg.id], eta=msg.repeat_date)
