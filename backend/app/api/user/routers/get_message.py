@@ -20,6 +20,6 @@ async def list_message(
 ):
     msg = await adapter.get_by_id(Message, msg_id, session)
     msg_sch = MessageScheme.model_validate(msg, from_attributes=True)
-    if msg.end_date < datetime.now(timezone.utc):
+    if msg.end_date > datetime.now(timezone.utc):
         msg_sch.is_active = False
     return (msg_sch)
