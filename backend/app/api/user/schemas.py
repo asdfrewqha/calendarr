@@ -33,6 +33,7 @@ class CreatedMessageResponse(BaseModel):
 
 
 class MessageScheme(BaseModel):
+    id: Optional[UUID] = None
     user_id: Optional[int] = None
     name: Optional[str] = None
     payload: Optional[dict] = None
