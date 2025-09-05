@@ -1,19 +1,20 @@
 // main.tsx
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import { HashRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import App from './App';
-
+import CreateMsg from './pages/CreateMsg';
 
 
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
-    <HashRouter>
+    <BrowserRouter>
       <Routes>
         <Route path="/" element={<App />} />
-        <Route path="*" element={<App />} />
+        <Route path="/create" element={<CreateMsg />} />
+        {/* <Route path="*" element={<App />} /> */}
       </Routes>
-    </HashRouter>
+    </BrowserRouter>
   </React.StrictMode>
 );
