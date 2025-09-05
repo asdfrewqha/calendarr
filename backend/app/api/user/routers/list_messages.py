@@ -15,10 +15,11 @@ router = APIRouter()
 async def list_message(
     user: Annotated[User, Depends(check_user_token)],
     session: Annotated[AsyncSession, Depends(get_async_session)],
-    start_date: Optional[date] = Query(None),
-    end_date: date = Query(...),
+    start_date: date = Query(...),
+    end_date: Optional[date] = Query(None)
 ):
-    start_date = datetime.combine(start_date, time())
+    if start_date:
+        start_date = datetime.combine(start_date, time())
     if end_date:
         end_date = datetime.combine(end_date, time(23, 59, 59))
         list_messages = await adapter.get_by_cond(Message, "end_send_date", start_date, ">=", "end_send_date", end_date, "<=", "user_id", user.id, "==", session=session)
