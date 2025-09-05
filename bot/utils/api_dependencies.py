@@ -29,24 +29,24 @@ def create_init_data(user_id: int, username: str = None) -> str:
 
 async def get_access_token(chat_id: int, chat_username: str = None):
     init_data = create_init_data(chat_id, chat_username)
-    print(">>> initData:", init_data)
-    async with aiohttp.ClientSession() as session:
+    async with aiohttp.ClientSession(cookie_jar=aiohttp.CookieJar()) as session:
         headers = {"Content-Type": "application/x-www-form-urlencoded"}
         data = {"initData": init_data}
         async with session.post(f"{BACKEND_URL}/get-token", data=data, headers=headers) as response:
             if response.status != 200:
                 raise Exception(f"Token request failed: {response.status}")
-            tokens = await response.json()
-            return str(tokens["access"])
+            return session
 
 
 async def check_notifications(chat_id: int, msg_id: UUID):
-    token = await get_access_token(chat_id=chat_id)
-    async with aiohttp.ClientSession() as session:
-        async with session.get(
-            f"{BACKEND_URL}/check-notific/{msg_id}", headers={"Authorization": f"Bearer {token}"}
-        ) as resp:
-            if resp.status == 200:
-                return await resp.json()
-            else:
-                return False
+    session_with_cookies = await get_access_token(chat_id=chat_id)
+
+    async with session_with_cookies.get(
+        f"{BACKEND_URL}/check-notific/{msg_id}"
+    ) as resp:
+        if resp.status == 200:
+            return await resp.json()
+        elif resp.status == 204:
+            return None
+        else:
+            raise Exception(f"Check notifications failed: {resp.status}")
