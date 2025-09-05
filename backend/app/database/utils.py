@@ -6,3 +6,4 @@ class MessageType(Enum):
     NOTIFICATION = "NOTIF"
     EVENT = "EVENT"
     TASK = "TASK"
+    ARRAY = "ARRAY"

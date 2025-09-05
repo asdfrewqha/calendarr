@@ -19,23 +19,29 @@ async def on_message(message: aio_pika.IncomingMessage):
         msg_id = data.get("msg_id")
 
         payload = await check_notifications(chat_id=chat_id, msg_id=UUID(msg_id))
-        if payload:
-            start = payload.get("start_notification")
-            if payload.get("text"):
-                text = f'**{payload.get("name")}**\n\nВаше напоминание.\nПриоритет: {payload["priority"]}\nСообщение:\n{payload["text"]}\n{"Это первое напоминание." if start else ""}'
-            elif payload.get("array"):
-                array = payload.get("array")
-                message = ""
-                for arr in array:
-                    key, val = arr
-                    ind = "✅" if val else "❎"
-                    message = message + key + ": " + ind + "\n"
-                text = f'**{payload.get("name")}**\n\nВаше напоминание.\nПриоритет: {payload["priority"]}\nСписок:\n{message}\n{"Это первое напоминание." if start else ""}'
-            elif payload.get("name"):
-                text = f'**{payload.get("name")}**\n\nВаше напоминание.\nПриоритет: {payload["priority"]}\n{"Это первое напоминание ." if start else ""}'
-            else:
-                text = f'Ваше напоминание с приоритетом: {payload["priority"]}.\n{"Это первое напоминание." if start else ""}'
-            await send_md_message(chat_id=chat_id, text=text)
+
+        start = payload.get("start_notification", False)
+        priority = payload.get("priority", "Unknown")
+        name = payload.get("name")
+
+        header = f"**{name}**\n\n" if name else ""
+        priority_text = f"Приоритет: {priority}\n"
+        start_text = "Это первое напоминание.\n" if start else ""
+
+        if payload.get("text"):
+            content = f"Сообщение:\n{payload['text']}\n"
+        elif payload.get("array"):
+            content = "Список:\n"
+            for key, val in payload["array"]:
+                indicator = "✅" if val else "❎"
+                content += f"{key}: {indicator}\n"
+            content += "\n"
+        else:
+            content = ""
+
+        text = f"{header}Ваше напоминание.\n{priority_text}{content}{start_text}"
+
+        await send_md_message(chat_id=chat_id, text=text)
 
 
 async def connect_with_retry(url, retries=10, delay=5):
