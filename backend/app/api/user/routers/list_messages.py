@@ -31,7 +31,7 @@ async def list_message(
 
     for msg in list_messages:
         msg_sch = MessageScheme.model_validate(msg, from_attributes=True)
-        if end_date < current_time:
+        if msg.end_send_date < current_time:
             msg_sch.is_active = False
         else:
             msg_sch.is_active = True
