@@ -31,10 +31,10 @@ async def check_notifications(
         payload["start_notification"] = True if msg.priority else False
         if msg.repeat:
             if msg.repeat_date:
-                schedule_telegram_message.apply_async(kwargs={"user_id": user.id, "msg_id": msg.id}, eta=msg.repeat_date)
+                schedule_telegram_message.apply_async(args={user.id, msg.id}, eta=msg.repeat_date)
                 if msg.start_date:
-                    schedule_telegram_message.apply_async(kwargs={"user_id": user.id, "msg_id": msg.id}, eta=msg.repeat_date + timedelta(hours=24))
+                    schedule_telegram_message.apply_async(args={user.id, msg.id}, eta=msg.repeat_date + timedelta(hours=24))
             elif msg.repeat_wd:
-                schedule_telegram_message.apply_async(kwargs={"user_id": user.id, "msg_id": msg.id}, eta=find_next_weekday(msg.repeat_wd))
+                schedule_telegram_message.apply_async(args={user.id, msg.id}, eta=find_next_weekday(msg.repeat_wd))
         return payload
     return emptyresponse(204)
