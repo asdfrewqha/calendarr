@@ -1,8 +1,4 @@
-from aiogram.types import (
-    InlineKeyboardButton,
-    InlineKeyboardMarkup,
-    WebAppInfo,
-)
+from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup, WebAppInfo
 from core.config import FRONTEND_URL
 
 inline_miniapp_kbd = InlineKeyboardMarkup(

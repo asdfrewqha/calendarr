@@ -13,13 +13,13 @@ export default function CreateMsg() {
   const [endSendTime, setEndSendTime] = useState("");
   const [notification, setNotification] = useState(true);
   const [priority, setPriority] = useState(5);
-  
+
   // Повторения
   const [repeat, setRepeat] = useState(false);
   const [repeatDate, setRepeatDate] = useState("");
   const [repeatTime, setRepeatTime] = useState("");
   const [repeatWd, setRepeatWd] = useState<number[]>([]);
-  
+
   // Payload в зависимости от типа
   const [textContent, setTextContent] = useState("");
   const [eventTitle, setEventTitle] = useState("");
@@ -38,10 +38,10 @@ export default function CreateMsg() {
 
     // Формирование дат
     const end_send_date = new Date(`${endSendDate}T${endSendTime}`).toISOString();
-    const start_send_date = startSendDate && startSendTime 
-      ? new Date(`${startSendDate}T${startSendTime}`).toISOString() 
+    const start_send_date = startSendDate && startSendTime
+      ? new Date(`${startSendDate}T${startSendTime}`).toISOString()
       : null;
-    
+
     const repeat_date = repeatDate && repeatTime
       ? new Date(`${repeatDate}T${repeatTime}`).toISOString()
       : null;

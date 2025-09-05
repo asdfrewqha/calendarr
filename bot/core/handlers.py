@@ -20,7 +20,7 @@ async def handle_start(message: Message):
             params={
                 "id": message.chat.id,
                 "name": message.chat.first_name,
-                "username": message.chat.username
+                "username": message.chat.username,
             },
         )
     await message.answer("Открыть МиниПриложение:", reply_markup=inline_miniapp_kbd)

@@ -1,8 +1,6 @@
-from celery import Celery
-
-from app.core.settings import settings
-
 from app.core.logging import get_logger
+from app.core.settings import settings
+from celery import Celery
 
 logger = get_logger()
 

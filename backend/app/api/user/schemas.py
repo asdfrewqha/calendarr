@@ -1,8 +1,9 @@
-from pydantic import BaseModel, ConfigDict
 from datetime import datetime
 from typing import Optional
-from app.database.utils import MessageType
 from uuid import UUID
+
+from app.database.utils import MessageType
+from pydantic import BaseModel, ConfigDict
 
 
 class UserProfileResponse(BaseModel):

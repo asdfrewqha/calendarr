@@ -121,7 +121,7 @@ services:
       - backend_net
 
   aiobot:
-    image: asdfrewqha/calendar_bot:latest 
+    image: asdfrewqha/calendar_bot:latest
     container_name: aiobot-container
     env_file:
       - /root/fastapi/.env

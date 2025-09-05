@@ -1,14 +1,13 @@
-import inflect
 from datetime import datetime
-from typing import Optional, List
+from typing import List, Optional
 
-from sqlalchemy import String, BigInteger, DateTime, Boolean, Enum, Integer, ARRAY
-from sqlalchemy.orm import Mapped, mapped_column, declarative_base, declared_attr
-from sqlalchemy.dialects.postgresql import JSONB
-
+import inflect
 from app.database.mixins.id_mixins import IDMixin
 from app.database.mixins.timestamp_mixins import TimestampsMixin
 from app.database.utils import MessageType
+from sqlalchemy import ARRAY, BigInteger, Boolean, DateTime, Enum, Integer, String
+from sqlalchemy.dialects.postgresql import JSONB
+from sqlalchemy.orm import Mapped, declarative_base, declared_attr, mapped_column
 
 p = inflect.engine()
 
@@ -33,7 +32,9 @@ class Message(IDMixin, TimestampsMixin, Base):
     user_id: Mapped[int] = mapped_column(BigInteger)
     name: Mapped[str] = mapped_column(String, nullable=True)
     payload: Mapped[dict] = mapped_column(JSONB, nullable=True)
-    start_send_date: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True), nullable=True)
+    start_send_date: Mapped[Optional[datetime]] = mapped_column(
+        DateTime(timezone=True), nullable=True
+    )
     end_send_date: Mapped[datetime] = mapped_column(DateTime(timezone=True))
     type: Mapped[MessageType] = mapped_column(Enum(MessageType), default=MessageType.TEXT)
     notification: Mapped[bool] = mapped_column(Boolean, default=True)

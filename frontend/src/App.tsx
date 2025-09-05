@@ -67,7 +67,7 @@ export default function App() {
         // Сохраняем информацию для отладки
         const responseText = await response.text();
         setDebugInfo(`Status: ${response.status}, Response: ${responseText}`);
-        
+
         let data: ApiResponse;
         try {
           data = JSON.parse(responseText);
@@ -125,7 +125,7 @@ export default function App() {
             <div className="error-icon">⚠️</div>
             <h3>Ошибка аутентификации</h3>
             <p>{error}</p>
-            
+
             {/* Добавляем отладочную информацию */}
             {debugInfo && (
               <details className="debug-info">
@@ -133,13 +133,13 @@ export default function App() {
                 <pre>{debugInfo}</pre>
               </details>
             )}
-            
+
             <div className="button-group">
               <button onClick={openInTelegram} className="telegram-btn">
                 📱 Открыть в Telegram
               </button>
-              <button 
-                onClick={() => window.location.reload()} 
+              <button
+                onClick={() => window.location.reload()}
                 className="retry-btn"
               >
                 🔄 Попробовать снова

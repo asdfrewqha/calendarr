@@ -1,11 +1,10 @@
 # main.py
 from contextlib import asynccontextmanager
 
+from app.core.log_middleware import LoggingMiddleware
+from app.core.logging import setup_logging
 from app.core.routers_loader import include_all_routers
 from app.database.adapter import adapter
-from app.core.logging import setup_logging
-from app.core.log_middleware import LoggingMiddleware
-
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import RedirectResponse
@@ -33,9 +32,7 @@ def create_app() -> FastAPI:
 
     app.add_middleware(
         CORSMiddleware,
-        allow_origins=[
-            "https://asdfrewqha.ru"
-        ],
+        allow_origins=["https://asdfrewqha.ru"],
         allow_credentials=True,
         allow_methods=["*"],
         allow_headers=["*"],

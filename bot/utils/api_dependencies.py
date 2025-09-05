@@ -44,9 +44,7 @@ async def get_access_cookies(chat_id: int, chat_username: str = None):
 async def check_notifications(chat_id: int, msg_id: UUID):
     cookies = await get_access_cookies(chat_id=chat_id)
     async with aiohttp.ClientSession(cookies=cookies) as session:
-        async with session.get(
-            f"{BACKEND_URL}/check-notific/{msg_id}"
-        ) as resp:
+        async with session.get(f"{BACKEND_URL}/check-notific/{msg_id}") as resp:
             if resp.status == 200:
                 return await resp.json()
             elif resp.status == 204:

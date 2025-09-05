@@ -1,12 +1,13 @@
-from fastapi import APIRouter, Depends
-from sqlalchemy.ext.asyncio import AsyncSession
+from typing import Annotated
+
+from app.api.user.schemas import CreatedMessageResponse, MessageCreateScheme
+from app.api.user.tasks import schedule_telegram_message
 from app.database.adapter import adapter
 from app.database.models import Message, User
 from app.database.session import get_async_session
-from app.api.user.schemas import MessageCreateScheme, CreatedMessageResponse
-from app.api.user.tasks import schedule_telegram_message
 from app.dependencies.checks import check_user_token
-from typing import Annotated
+from fastapi import APIRouter, Depends
+from sqlalchemy.ext.asyncio import AsyncSession
 
 router = APIRouter()
 
@@ -15,7 +16,7 @@ router = APIRouter()
 async def create_message(
     msg: MessageCreateScheme,
     user: Annotated[User, Depends(check_user_token)],
-    session: Annotated[AsyncSession, Depends(get_async_session)]
+    session: Annotated[AsyncSession, Depends(get_async_session)],
 ):
     msg.user_id = user.id
     msg_dict = MessageCreateScheme.model_dump(msg)

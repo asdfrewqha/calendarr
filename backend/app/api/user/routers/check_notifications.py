@@ -1,14 +1,14 @@
-from typing import Annotated
 from datetime import timedelta
+from typing import Annotated
 from uuid import UUID
 
-from app.dependencies.checks import check_user_token
-from app.dependencies.responses import emptyresponse
+from app.api.user.tasks import schedule_telegram_message
+from app.api.user.utils import find_next_weekday
 from app.database.adapter import adapter
 from app.database.models import Message, User
 from app.database.session import get_async_session
-from app.api.user.tasks import schedule_telegram_message
-from app.api.user.utils import find_next_weekday
+from app.dependencies.checks import check_user_token
+from app.dependencies.responses import emptyresponse
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -19,7 +19,7 @@ router = APIRouter()
 async def check_notifications(
     user: Annotated[User, Depends(check_user_token)],
     msg_id: UUID,
-    session: Annotated[AsyncSession, Depends(get_async_session)]
+    session: Annotated[AsyncSession, Depends(get_async_session)],
 ):
     msg = await adapter.get_by_id(Message, msg_id, session=session)
     if not msg:
@@ -33,8 +33,12 @@ async def check_notifications(
             if msg.repeat_date:
                 schedule_telegram_message.apply_async(args=[user.id, msg.id], eta=msg.repeat_date)
                 if msg.start_send_date:
-                    schedule_telegram_message.apply_async(args=[user.id, msg.id], eta=msg.repeat_date + timedelta(hours=24))
+                    schedule_telegram_message.apply_async(
+                        args=[user.id, msg.id], eta=msg.repeat_date + timedelta(hours=24)
+                    )
             elif msg.repeat_wd:
-                schedule_telegram_message.apply_async(args=[user.id, msg.id], eta=find_next_weekday(msg.repeat_wd))
+                schedule_telegram_message.apply_async(
+                    args=[user.id, msg.id], eta=find_next_weekday(msg.repeat_wd)
+                )
         return payload
     return emptyresponse(204)

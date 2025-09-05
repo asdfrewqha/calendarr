@@ -149,11 +149,11 @@
   .app {
     padding: 15px;
   }
-  
+
   .button-group {
     flex-direction: column;
   }
-  
+
   .telegram-btn, .retry-btn {
     width: 100%;
   }
