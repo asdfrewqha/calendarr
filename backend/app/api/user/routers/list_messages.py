@@ -21,10 +21,10 @@ async def list_message(
     start_date = datetime.combine(start_date, time())
     if end_date:
         end_date = datetime.combine(end_date, time(23, 59, 59))
-        list_messages = await adapter.get_by_cond(Message, "end_send_date", ">=", start_date, "end_send_date", "<=", end_date, "user_id", "==", user.id, session=session)
+        list_messages = await adapter.get_by_cond(Message, "end_send_date", start_date, ">=", "end_send_date", "<=", end_date, "user_id", user.id, "==", session=session)
     else:
         end_date = datetime.combine(start_date, time(23, 59, 59))
-        list_messages = await adapter.get_by_cond(Message, "end_send_date", ">=", start_date, "end_send_date", "<=", end_date, "user_id", "==", user.id, session=session)
+        list_messages = await adapter.get_by_cond(Message, "end_send_date", start_date, ">=", "end_send_date", "<=", end_date, "user_id", user.id, "==", session=session)
     response = []
     for msg in list_messages:
         response.append(MessageScheme.model_dump(msg))
