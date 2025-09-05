@@ -22,17 +22,17 @@ async def on_message(message: aio_pika.IncomingMessage):
         if payload:
             start = payload.get("start_notification")
             if payload.get("text"):
-                text = f'**{payload.get("name")}**\n\nВаше напоминание.\nПриоритет: {payload["priority"]}\nСообщение:\n{payload["text"]}\n{"Это первое напоминание." if start else None}'
+                text = f'**{payload.get("name")}**\n\nВаше напоминание.\nПриоритет: {payload["priority"]}\nСообщение:\n{payload["text"]}\n{"Это первое напоминание." if start else ""}'
             elif payload.get(0):
                 values = payload.values()
                 message = ""
                 for value in values:
                     message = message + value + "\n"
-                text = f'**{payload.get("name")}**\n\nВаше напоминание.\nПриоритет: {payload["priority"]}\nСписок:\n{message}\n{"Это первое напоминание." if start else None}'
+                text = f'**{payload.get("name")}**\n\nВаше напоминание.\nПриоритет: {payload["priority"]}\nСписок:\n{message}\n{"Это первое напоминание." if start else ""}'
             elif payload.get("name"):
-                text = f'**{payload.get("name")}**\n\nВаше напоминание.\nПриоритет: {payload["priority"]}\n{"Это первое напоминание ." if start else None}'
+                text = f'**{payload.get("name")}**\n\nВаше напоминание.\nПриоритет: {payload["priority"]}\n{"Это первое напоминание ." if start else ""}'
             else:
-                text = f'Ваше напоминание с приоритетом: {payload["priority"]}.\n{"Это первое напоминание." if start else None}'
+                text = f'Ваше напоминание с приоритетом: {payload["priority"]}.\n{"Это первое напоминание." if start else ""}'
             await send_md_message(chat_id=chat_id, text=text)
 
 
