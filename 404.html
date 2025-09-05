@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Redirecting...</title>
+    <script>
+      // Перенаправляем все 404 ошибки на index.html
+      sessionStorage.redirect = location.href;
+      location.replace('/');
+    </script>
+  </head>
+  <body>
+    <h1>Redirecting...</h1>
+  </body>
+</html>
