@@ -15,8 +15,8 @@ router = APIRouter()
 async def list_message(
     user: Annotated[User, Depends(check_user_token)],
     session: Annotated[AsyncSession, Depends(get_async_session)],
-    start_date: Query[None, date],
-    end_date: Query[..., date],
+    start_date: date = Query(None),
+    end_date: date = Query(...),
 ):
     start_date = datetime.combine(start_date, time())
     if end_date:
