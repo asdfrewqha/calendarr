@@ -32,9 +32,10 @@ async def on_message(message: aio_pika.IncomingMessage):
             content = f"Сообщение:\n{payload['text']}\n"
         elif payload.get("array"):
             content = "Список:\n"
-            for key, val in payload["array"]:
-                indicator = "✅" if val else "❎"
-                content += f"{key}: {indicator}\n"
+            for item in payload["array"]:
+                for key, val in item.items():
+                    indicator = "✅" if val else "❎"
+                    content += f"{key}: {indicator}\n"
             content += "\n"
         else:
             content = ""
