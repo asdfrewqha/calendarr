@@ -3,7 +3,6 @@ from typing import Annotated
 from app.core.logging import get_logger
 from app.database.models import User
 from app.dependencies.checks import check_refresh
-from app.dependencies.responses import okresponse
 from app.utils.token_manager import TokenManager
 from fastapi import APIRouter, Depends, Response, status
 
@@ -22,4 +21,4 @@ async def refresh(response: Response, user: Annotated[User, Depends(check_refres
             TokenManager.ACCESS_TOKEN_EXPIRE_MINUTES,
         ),
     )
-    return okresponse()
+    return response
