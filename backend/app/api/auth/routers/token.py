@@ -26,7 +26,19 @@ async def telegram_auth(
         return badresponse("User not found", 404)
 
     response = JSONResponse({"message": "success", "status": "success"})
-    response.set_cookie("access_token", TokenManager.create_token({"sub": str(bd_user.id)}))
-    response.set_cookie("refresh_token", TokenManager.create_token({"sub": str(bd_user.id)}, False))
+    response.set_cookie(
+        "access_token",
+        TokenManager.create_token({"sub": str(bd_user.id)}),
+        httponly=True,
+        secure=True,
+        samesite="none",
+    )
+    response.set_cookie(
+        "refresh_token",
+        TokenManager.create_token({"sub": str(bd_user.id)}, False),
+        httponly=True,
+        secure=True,
+        samesite="none",
+    )
 
     return response
