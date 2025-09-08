@@ -21,4 +21,4 @@ async def refresh(response: Response, user: Annotated[User, Depends(check_refres
         key="access_token", value=access_token, httponly=True, secure=True, samesite="None"
     )
 
-    return {"message": "Token refreshed successfully", "user_id": user.id}
+    return {"message": "Token refreshed successfully"}
