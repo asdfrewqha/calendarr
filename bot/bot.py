@@ -28,17 +28,17 @@ async def on_message(message: aio_pika.IncomingMessage):
         priority_text = f"Приоритет: {priority}\n"
         start_text = "Это первое напоминание.\n" if start else ""
 
-        if payload.get("text"):
-            content = f"Сообщение:\n{payload['text']}\n"
-        elif payload.get("array"):
+        if payload.get("description"):
+            content = f"Сообщение:\n{payload['description']}\n"
+        else:
+            content = ""
+        if payload.get("array"):
             content = "Список:\n"
             for item in payload["array"]:
                 for key, val in item.items():
                     indicator = "✅" if val else "❎"
                     content += f"{key}: {indicator}\n"
             content += "\n"
-        else:
-            content = ""
 
         text = f"{header}Ваше напоминание.\n{priority_text}{content}{start_text}"
 
