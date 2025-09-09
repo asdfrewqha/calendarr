@@ -25,7 +25,7 @@ async def check_notifications(
     if not msg:
         return emptyresponse(204)
     if msg.notification and user.notifications_bool:
-        payload = msg.payload
+        payload = msg.payload if msg.payload else {}
         payload["name"] = msg.name
         payload["priority"] = msg.priority
         payload["start_notification"] = True if msg.start_send_date else False

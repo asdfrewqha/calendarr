@@ -2,6 +2,8 @@ import { useState } from "react";
 import Calendar from "react-calendar";
 import "react-calendar/dist/Calendar.css";
 import { MessageType } from "../types";
+import { createEvent } from "../api/events";
+
 
 const weekDays = ["Вс", "Пн", "Вт", "Ср", "Чт", "Пт", "Сб"];
 
@@ -76,7 +78,9 @@ export default function CreateEvent() {
     }
 
     console.log("Создаем событие:", eventData);
-    // TODO: вызов API
+
+    createEvent(eventData);
+
   };
 
   return (
