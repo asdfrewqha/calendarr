@@ -1,12 +1,11 @@
 import json
+import logging
 from typing import Any, Optional
 
 import redis.asyncio as redis
 from core.config import REDIS_URL
 
-from backend.app.core.logging import get_logger
-
-logger = get_logger()
+logger = logging.getLogger(__name__)
 
 
 class AsyncRedisAdapter:
