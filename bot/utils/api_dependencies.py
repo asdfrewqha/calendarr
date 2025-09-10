@@ -7,6 +7,7 @@ from uuid import UUID
 
 import aiohttp
 from core.config import BACKEND_URL, BOT_TOKEN
+from models.redis_adapter import redis_adapter
 
 
 def create_init_data(user_id: int, username: str = None) -> str:
@@ -28,17 +29,36 @@ def create_init_data(user_id: int, username: str = None) -> str:
 
 
 async def get_access_cookies(chat_id: int, chat_username: str = None):
-    init_data = create_init_data(chat_id, chat_username)
-    async with aiohttp.ClientSession() as session:
-        headers = {"Content-Type": "application/x-www-form-urlencoded"}
-        data = {"initData": init_data}
-        async with session.post(f"{BACKEND_URL}/get-token", data=data, headers=headers) as response:
-            if response.status != 200:
-                raise Exception(f"Token request failed: {response.status}")
-            cookies = {}
-            for cookie_name, cookie_value in response.cookies.items():
-                cookies[cookie_name] = cookie_value.value
-            return cookies
+    access = await redis_adapter.get(f"access_token:{chat_id}")
+    refresh = await redis_adapter.get(f"refresh_token:{chat_id}")
+    if access:
+        return {"access_token": access, "refresh_token": refresh}
+    elif refresh:
+        async with aiohttp.ClientSession(
+            cookies={"access_token": access, "refresh_token": refresh}
+        ) as session:
+            async with session.get(f"{BACKEND_URL}/refresh") as response:
+                if response.status != 200:
+                    raise Exception(f"Token request failed: {response.status}")
+                cookies = {}
+                for cookie_name, cookie_value in response.cookies.items():
+                    cookies[cookie_name] = cookie_value.value
+                return cookies
+    else:
+        init_data = create_init_data(chat_id, chat_username)
+        async with aiohttp.ClientSession() as session:
+            headers = {"Content-Type": "application/x-www-form-urlencoded"}
+            data = {"initData": init_data}
+            async with session.post(
+                f"{BACKEND_URL}/get-token", data=data, headers=headers
+            ) as response:
+                if response.status != 200:
+                    raise Exception(f"Token request failed: {response.status}")
+                cookies = {}
+                for cookie_name, cookie_value in response.cookies.items():
+                    cookies[cookie_name] = cookie_value.value
+                    await redis_adapter.set(f"{cookie_name}:{chat_id}", cookie_value.value)
+                return cookies
 
 
 async def check_notifications(chat_id: int, msg_id: UUID):

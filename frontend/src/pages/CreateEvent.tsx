@@ -3,6 +3,7 @@ import Calendar from "react-calendar";
 import "react-calendar/dist/Calendar.css";
 import { MessageType } from "../types";
 import { createEvent } from "../api/events";
+import { useNavigate } from "react-router-dom";
 
 
 const weekDays = ["Вс", "Пн", "Вт", "Ср", "Чт", "Пт", "Сб"];
@@ -30,6 +31,8 @@ export default function CreateEvent() {
   // Повторение по неделям
   const [daysOfWeek, setDaysOfWeek] = useState<number[]>([]);
   const [weeklyTime, setWeeklyTime] = useState("09:00");
+
+  const navigate = useNavigate();
 
   const toggleDay = (day: number) => {
     setDaysOfWeek(prev =>
@@ -80,7 +83,7 @@ export default function CreateEvent() {
     console.log("Создаем событие:", eventData);
 
     createEvent(eventData);
-
+    navigate("/");
   };
 
   return (
