@@ -16,18 +16,24 @@ export default function CreateEvent() {
 
   const [repeatMode, setRepeatMode] = useState<"none" | "once" | "weekly">("none");
 
+  const getCurrentTime = () => {
+    const now = new Date();
+    const h = now.getHours().toString().padStart(2, "0");
+    const m = now.getMinutes().toString().padStart(2, "0");
+    return `${h}:${m}`;
+  };
+
   const [hasStart, setHasStart] = useState(false);
   const [startDate, setStartDate] = useState(new Date());
-  const [startTime, setStartTime] = useState("09:00");
+  const [startTime, setStartTime] = useState(getCurrentTime());
 
   const [endDate, setEndDate] = useState(new Date());
-  const [endTime, setEndTime] = useState("10:00");
+  const [endTime, setEndTime] = useState(getCurrentTime());
 
   const [repeatDate, setRepeatDate] = useState(new Date());
-  const [repeatTime, setRepeatTime] = useState("09:00");
+  const [repeatTime, setRepeatTime] = useState(getCurrentTime());
 
   const [daysOfWeek, setDaysOfWeek] = useState<number[]>([]);
-  const [weeklyTime, setWeeklyTime] = useState("09:00");
 
   const navigate = useNavigate();
 
@@ -73,7 +79,6 @@ export default function CreateEvent() {
       eventData.end_send_date = formatDateTime(endDate, endTime);
       eventData.repeat_date = undefined;
       eventData.repeat_wd = daysOfWeek;
-      eventData.repeat_time = weeklyTime;
     }
 
     console.log("Создаем событие:", eventData);
@@ -169,8 +174,6 @@ export default function CreateEvent() {
               </button>
             ))}
           </div>
-          <label className="block mb-1 font-medium">Время события</label>
-          <input type="time" className="p-1 rounded mt-1 bg-gray-700" value={weeklyTime} onChange={(e) => setWeeklyTime(e.target.value)} />
         </div>
       )}
 
