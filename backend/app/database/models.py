@@ -35,7 +35,7 @@ class Message(IDMixin, TimestampsMixin, Base):
     start_send_date: Mapped[Optional[datetime]] = mapped_column(
         DateTime(timezone=True), nullable=True
     )
-    # send_start: Mapped[bool] = mapped_column(Boolean, default=False)
+    send_start: Mapped[bool] = mapped_column(Boolean, default=False)
     end_send_date: Mapped[datetime] = mapped_column(DateTime(timezone=True))
     type: Mapped[MessageType] = mapped_column(Enum(MessageType), default=MessageType.TEXT)
     notification: Mapped[bool] = mapped_column(Boolean, default=True)

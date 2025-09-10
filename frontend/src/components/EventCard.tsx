@@ -8,6 +8,7 @@ type Props = {
   description?: string;
   type?: string;
   priority?: number;
+  is_active?: boolean; // новый параметр
   onDeleted?: (id: string) => void; // callback после удаления
 };
 
@@ -18,6 +19,7 @@ export default function EventCard({
   description,
   type,
   priority,
+  is_active = true,
   onDeleted,
 }: Props) {
   const handleDelete = async () => {
@@ -32,10 +34,16 @@ export default function EventCard({
   };
 
   return (
-    <div className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm hover:shadow-md transition">
+    <div
+      className={`rounded-xl border p-4 shadow-sm hover:shadow-md transition ${
+        is_active ? "border-gray-200 bg-white" : "border-gray-300 bg-gray-100"
+      }`}
+    >
       <div className="flex justify-between items-start">
-        <h3 className="font-semibold text-lg">{title}</h3>
-        <span className="text-sm text-gray-500">
+        <h3 className={`font-semibold text-lg ${!is_active ? "text-gray-400" : ""}`}>
+          {title}
+        </h3>
+        <span className={`text-sm ${is_active ? "text-gray-500" : "text-gray-400"}`}>
           {new Date(date).toLocaleString("ru-RU", {
             day: "2-digit",
             month: "short",
@@ -45,26 +53,40 @@ export default function EventCard({
         </span>
       </div>
 
-      {description && <p className="text-gray-600 mt-2">{description}</p>}
+      {description && (
+        <p className={`mt-2 ${is_active ? "text-gray-600" : "text-gray-400"}`}>{description}</p>
+      )}
 
-      <div className="mt-3 flex flex-wrap gap-3 text-sm text-gray-500">
-        {type && <span className="px-2 py-1 bg-gray-100 rounded">{type}</span>}
+      <div className="mt-3 flex flex-wrap gap-3 text-sm">
+        {type && (
+          <span className={`px-2 py-1 rounded ${is_active ? "bg-gray-100 text-gray-500" : "bg-gray-200 text-gray-400"}`}>
+            {type}
+          </span>
+        )}
         {priority !== undefined && (
-          <span className="px-2 py-1 bg-gray-100 rounded">Приоритет {priority}</span>
+          <span className={`px-2 py-1 rounded ${is_active ? "bg-gray-100 text-gray-500" : "bg-gray-200 text-gray-400"}`}>
+            Приоритет {priority}
+          </span>
+        )}
+        {!is_active && (
+          <span className="px-2 py-1 bg-red-100 text-red-500 rounded text-xs font-medium">
+            Неактивно
+          </span>
         )}
       </div>
 
       <div className="mt-3 flex gap-4">
         <Link
           to={`/edit/${id}`}
-          className="text-sm text-tg hover:underline font-medium"
+          className={`text-sm font-medium ${is_active ? "text-tg hover:underline" : "text-gray-400 cursor-not-allowed"}`}
         >
           ✏️ Редактировать
         </Link>
 
         <button
           onClick={handleDelete}
-          className="text-sm text-red-500 hover:underline font-medium"
+          className={`text-sm font-medium ${is_active ? "text-red-500 hover:underline" : "text-gray-400 cursor-not-allowed"}`}
+          disabled={!is_active}
         >
           🗑️ Удалить
         </button>

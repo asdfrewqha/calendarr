@@ -20,7 +20,7 @@ class MessageCreateScheme(BaseModel):
     name: Optional[str] = None
     payload: Optional[dict] = None
     start_send_date: Optional[datetime] = None
-    # send_start: bool = False
+    send_start: bool = False
     end_send_date: datetime
     type: MessageType
     notification: bool = True

@@ -28,11 +28,15 @@ async def check_notifications(
         payload = msg.payload if msg.payload else {}
         payload["name"] = msg.name
         payload["priority"] = msg.priority
-        payload["start_notification"] = True if msg.start_send_date else False
+        if msg.send_start:
+            payload["start_notification"] = True
+            await adapter.update_by_id(Message, msg_id, {"send_start": False})
+        else:
+            payload["start_notification"] = False
         if msg.repeat:
             if msg.repeat_date:
                 schedule_telegram_message.apply_async(args=[user.id, msg.id], eta=msg.repeat_date)
-                if msg.start_send_date:
+                if msg.send_start:
                     schedule_telegram_message.apply_async(
                         args=[user.id, msg.id], eta=msg.repeat_date + timedelta(hours=24)
                     )
