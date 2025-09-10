@@ -22,7 +22,7 @@ export async function createEvent(data: any) {
 
 export async function updateEvent(id: string, data: any) {
   const res = await fetch(`${API_URL}/update-msg/${id}`, {
-    method: "POST",
+    method: "PATCH",
     headers: { "Content-Type": "application/json" },
     credentials: "include",
     body: JSON.stringify(data),
@@ -46,4 +46,11 @@ export async function getEvents(start: string, end?: string) {
   const res = await fetch(url.toString(), { credentials: "include" });
   if (!res.ok) return [];
   return res.json();
+}
+
+export async function delEvent(id: string) {
+  await fetch(`${API_URL}/del-msg/${id}`, {
+    method: "DELETE",
+    credentials: "include"
+  });
 }

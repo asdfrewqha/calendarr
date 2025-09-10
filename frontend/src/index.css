@@ -3,6 +3,78 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Базовый стиль календаря */
+.react-calendar {
+  background-color: #1f2937; /* bg-gray-800 */
+  color: white;
+  border: none;
+  border-radius: 0.5rem;
+  padding: 0.5rem;
+}
+
+/* Все ячейки */
+.react-calendar__tile {
+  background: #374151; /* bg-gray-700 */
+  color: white;
+}
+
+/* Сегодня */
+.react-calendar__tile--now {
+  border: 2px solid #3b82f6; /* синяя рамка */
+  background: #1f2937 !important; /* тёмный фон */
+  color: white !important;
+}
+
+.react-calendar__tile:enabled:hover {
+  background: #1e3a8a !important; /* тот же темный фон */
+  color: white !important;
+}
+
+.react-calendar__tile--now:enabled:hover,
+.react-calendar__tile--now:enabled:focus {
+  background: #1e3a8a !important; /* такой же тёмный как диапазон */
+  color: #bfdbfe !important;
+}
+
+/* Активный день */
+.react-calendar__tile--active {
+  background: #1e40af !important; /* blue-900 */
+  color: white !important;
+}
+
+/* Диапазоны */
+.react-calendar__tile--range,
+.react-calendar__tile--hover {
+  background: #1e3a8a !important; /* blue-800 */
+  color: white !important;
+}
+
+.react-calendar__tile--rangeStart,
+.react-calendar__tile--rangeEnd,
+.react-calendar__tile--rangeBothEnds {
+  background: #1e40af !important; /* чуть темнее */
+  color: white !important;
+}
+.react-calendar__tile--range:enabled:hover,
+.react-calendar__tile--hover:enabled:hover,
+.react-calendar__tile--rangeStart:enabled:hover,
+.react-calendar__tile--rangeEnd:enabled:hover {
+  background: #1e3a8a !important;
+  color: #bfdbfe !important;
+}
+
+.react-calendar__month-view__days__day.react-calendar__tile--hover,
+.react-calendar__month-view__days__day.react-calendar__tile--range:hover,
+.react-calendar__month-view__days__day.react-calendar__tile--range.react-calendar__tile--hover,
+.react-calendar__month-view__days__day.react-calendar__tile--rangeStart.react-calendar__tile--hover,
+.react-calendar__month-view__days__day.react-calendar__tile--rangeEnd.react-calendar__tile--hover {
+  background: #1e3a8a !important; /* тёмно-синий фон */
+  color: #bfdbfe !important;      /* мягкий голубой текст */
+}
+
+.react-calendar__month-view__days__day--weekend {
+  color: #f87171; /* красные выходные */
+}
 
 
 body {

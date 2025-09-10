@@ -1,34 +1,31 @@
 import { useState } from "react";
 import Calendar from "react-calendar";
 import "react-calendar/dist/Calendar.css";
-import { MessageType } from "../types";
+import { MessageType, MessageTypeLabel } from "../types";
 import { createEvent } from "../api/events";
 import { useNavigate } from "react-router-dom";
-
 
 const weekDays = ["Вс", "Пн", "Вт", "Ср", "Чт", "Пт", "Сб"];
 
 export default function CreateEvent() {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [type, setType] = useState<MessageType>(MessageType.EVENT);
+  const [type, setType] = useState<MessageType>(MessageType.TEXT);
   const [priority, setPriority] = useState(5);
   const [notification, setNotification] = useState(true);
 
   const [repeatMode, setRepeatMode] = useState<"none" | "once" | "weekly">("none");
 
-  const [hasStart, setHasStart] = useState(true);
+  const [hasStart, setHasStart] = useState(false);
   const [startDate, setStartDate] = useState(new Date());
   const [startTime, setStartTime] = useState("09:00");
 
   const [endDate, setEndDate] = useState(new Date());
   const [endTime, setEndTime] = useState("10:00");
 
-  // Однократное повторение
   const [repeatDate, setRepeatDate] = useState(new Date());
   const [repeatTime, setRepeatTime] = useState("09:00");
 
-  // Повторение по неделям
   const [daysOfWeek, setDaysOfWeek] = useState<number[]>([]);
   const [weeklyTime, setWeeklyTime] = useState("09:00");
 
@@ -55,13 +52,12 @@ export default function CreateEvent() {
     const eventData: any = {
       name: title,
       payload: description ? { description } : undefined,
-      type,
+      type, // отправляем код enum на сервер
       priority,
       notification,
       repeat: repeatMode !== "none",
     };
 
-    // Логика дат
     if (repeatMode === "none") {
       if (hasStart) eventData.start_send_date = formatDateTime(startDate, startTime);
       eventData.end_send_date = formatDateTime(endDate, endTime);
@@ -73,7 +69,7 @@ export default function CreateEvent() {
       eventData.repeat_date = formatDateTime(repeatDate, repeatTime);
       eventData.repeat_wd = undefined;
     } else if (repeatMode === "weekly") {
-      eventData.start_send_date = undefined;
+      if (hasStart) eventData.start_send_date = formatDateTime(startDate, startTime);
       eventData.end_send_date = formatDateTime(endDate, endTime);
       eventData.repeat_date = undefined;
       eventData.repeat_wd = daysOfWeek;
@@ -98,8 +94,8 @@ export default function CreateEvent() {
           onChange={(e) => setType(e.target.value as MessageType)}
           className="w-full p-2 rounded bg-gray-700"
         >
-          {Object.values(MessageType).map((t) => (
-            <option key={t} value={t}>{t}</option>
+          {Object.entries(MessageTypeLabel).map(([key, label]) => (
+            <option key={key} value={key}>{label}</option>
           ))}
         </select>
       </div>
@@ -187,7 +183,7 @@ export default function CreateEvent() {
       {/* Приоритет */}
       <div>
         <label>Приоритет</label>
-        <input type="number" min={1} max={5} value={priority} onChange={(e) => setPriority(Number(e.target.value))} className="w-full p-1 rounded bg-gray-700" />
+        <input type="number"  value={priority === 0 ? "" : priority} onChange={(e) => setPriority(Number(e.target.value))} className="w-full p-1 rounded bg-gray-700" />
       </div>
 
       <button onClick={handleSubmit} className="w-full p-2 bg-blue-600 rounded mt-2">Создать</button>
