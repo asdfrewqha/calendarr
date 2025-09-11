@@ -16,6 +16,7 @@ class UserProfileResponse(BaseModel):
 
 
 class MessageCreateScheme(BaseModel):
+    id: Optional[UUID] = None
     user_id: Optional[int] = None
     name: Optional[str] = None
     payload: Optional[dict] = None
@@ -52,6 +53,7 @@ class MessageScheme(BaseModel):
 
 
 class MessageUpdateScheme(BaseModel):
+    id: Optional[UUID] = None
     name: Optional[str] = None
     payload: Optional[dict] = None
     start_send_date: Optional[datetime] = None

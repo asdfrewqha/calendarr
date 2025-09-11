@@ -1,13 +1,16 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import Calendar from "react-calendar";
 import "react-calendar/dist/Calendar.css";
 import { MessageType, MessageTypeLabel } from "../types";
-import { createEvent } from "../api/events";
-import { useNavigate } from "react-router-dom";
+import { getEvent, updateEvent } from "../api/events";
 
 const weekDays = ["Вс", "Пн", "Вт", "Ср", "Чт", "Пт", "Сб"];
 
-export default function CreateEvent() {
+export default function EditEvent() {
+  const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
+
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [type, setType] = useState<MessageType>(MessageType.TEXT);
@@ -16,26 +19,58 @@ export default function CreateEvent() {
 
   const [repeatMode, setRepeatMode] = useState<"none" | "once" | "weekly">("none");
 
-  const getCurrentTime = () => {
-    const now = new Date();
-    const h = now.getHours().toString().padStart(2, "0");
-    const m = now.getMinutes().toString().padStart(2, "0");
-    return `${h}:${m}`;
-  };
-
   const [hasStart, setHasStart] = useState(false);
   const [startDate, setStartDate] = useState(new Date());
-  const [startTime, setStartTime] = useState(getCurrentTime());
+  const [startTime, setStartTime] = useState("00:00");
 
   const [endDate, setEndDate] = useState(new Date());
-  const [endTime, setEndTime] = useState(getCurrentTime());
+  const [endTime, setEndTime] = useState("00:00");
 
   const [repeatDate, setRepeatDate] = useState(new Date());
-  const [repeatTime, setRepeatTime] = useState(getCurrentTime());
+  const [repeatTime, setRepeatTime] = useState("00:00");
 
   const [daysOfWeek, setDaysOfWeek] = useState<number[]>([]);
 
-  const navigate = useNavigate();
+  // --------------------- загрузка текущего события ---------------------
+  useEffect(() => {
+    if (!id) return;
+
+    const loadEvent = async () => {
+      const data = await getEvent(id);
+      setTitle(data.name || "");
+      setDescription(data.payload?.description || "");
+      setType(data.type);
+      setPriority(data.priority ?? 5);
+      setNotification(data.notification ?? true);
+
+      setHasStart(!!data.start_send_date);
+      if (data.start_send_date) {
+        const start = new Date(data.start_send_date);
+        setStartDate(start);
+        setStartTime(start.toISOString().slice(11, 16));
+      }
+
+      const end = new Date(data.end_send_date);
+      setEndDate(end);
+      setEndTime(end.toISOString().slice(11, 16));
+
+      if (data.repeat) {
+        if (data.repeat_date) {
+          setRepeatMode("once");
+          const rd = new Date(data.repeat_date);
+          setRepeatDate(rd);
+          setRepeatTime(rd.toISOString().slice(11, 16));
+        } else if (data.repeat_wd?.length) {
+          setRepeatMode("weekly");
+          setDaysOfWeek(data.repeat_wd);
+        }
+      } else {
+        setRepeatMode("none");
+      }
+    };
+
+    loadEvent();
+  }, [id]);
 
   const toggleDay = (day: number) => {
     setDaysOfWeek(prev =>
@@ -54,11 +89,13 @@ export default function CreateEvent() {
     return dt.toISOString();
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
+    if (!id) return;
+
     const eventData: any = {
       name: title,
       payload: description ? { description } : undefined,
-      type, // отправляем код enum на сервер
+      type,
       priority,
       notification,
       repeat: repeatMode !== "none",
@@ -81,15 +118,15 @@ export default function CreateEvent() {
       eventData.repeat_wd = daysOfWeek;
     }
 
-    console.log("Создаем событие:", eventData);
+    console.log("Обновляем событие:", eventData);
 
-    createEvent(eventData);
+    await updateEvent(id, eventData);
     navigate("/");
   };
 
   return (
     <div className="max-w-md mx-auto p-4 space-y-4 bg-gray-800 rounded-xl text-white">
-      <h2 className="text-xl font-bold">Создать событие</h2>
+      <h2 className="text-xl font-bold">Редактировать событие</h2>
 
       {/* Тип события */}
       <div>
@@ -120,7 +157,7 @@ export default function CreateEvent() {
         onChange={(e) => setDescription(e.target.value)}
       />
 
-      {/* Выбор режима повторения */}
+      {/* Повторение */}
       <div className="space-y-1">
         <label className="block font-medium">Повторение</label>
         <select
@@ -186,10 +223,10 @@ export default function CreateEvent() {
       {/* Приоритет */}
       <div>
         <label>Приоритет</label>
-        <input type="number" value={priority === 0 ? "" : priority} onChange={(e) => setPriority(Number(e.target.value))} className="w-full p-1 rounded bg-gray-700" />
+        <input type="number"  value={priority === 0 ? "" : priority} onChange={(e) => setPriority(Number(e.target.value))} className="w-full p-1 rounded bg-gray-700" />
       </div>
 
-      <button onClick={handleSubmit} className="w-full p-2 bg-blue-600 rounded mt-2">Создать</button>
+      <button onClick={handleSubmit} className="w-full p-2 bg-blue-600 rounded mt-2">Сохранить изменения</button>
     </div>
   );
 }

@@ -135,6 +135,7 @@ export default function Home() {
             description={event.description}
             type={event.type}
             priority={event.priority}
+            onDeleted={(id) => setEvents((prev) => prev.filter((e) => e.id !== id))}
           />
         ))}
       </div>
