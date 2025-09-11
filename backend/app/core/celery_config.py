@@ -12,4 +12,5 @@ app.conf.update(
     result_backend=settings.redis_settings.redis_url,
 )
 
+app.autodiscover_tasks(packages=["app.api.user"])
 logger.info("Celery configuration loaded successfully")
