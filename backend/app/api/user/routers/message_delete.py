@@ -21,5 +21,7 @@ async def list_message(
     msg_id: UUID,
 ):
     await adapter.delete(Message, msg_id, session)
-    await redis_adapter.publish(f"messages:{user.id}", {"event": "message_deleted", "id": msg_id})
+    await redis_adapter.publish(
+        f"messages:{user.id}", {"event": "message_deleted", "id": str(msg_id)}
+    )
     return emptyresponse()
