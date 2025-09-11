@@ -1,5 +1,6 @@
+import asyncio
 import json
-from typing import Any, AsyncGenerator, Optional
+from typing import Any, Optional
 
 import redis.asyncio as redis
 from app.core.logging import get_logger
@@ -67,18 +68,19 @@ class AsyncRedisAdapter:
             logger.exception(f"Redis PUBLISH error: {e}")
             return False
 
-    async def subscribe(self, channel: str) -> AsyncGenerator[dict, None]:
+    async def subscribe(self, channel: str):
+        pubsub = self.redis.pubsub()
+        await pubsub.subscribe(channel)
         try:
-            pubsub = self.redis.pubsub()
-            await pubsub.subscribe(channel)
-            async for msg in pubsub.listen():
-                if msg["type"] == "message":
+            while True:
+                message = await pubsub.get_message(ignore_subscribe_messages=True, timeout=1.0)
+                if message is not None:
                     try:
-                        yield json.loads(msg["data"])
+                        yield json.loads(message["data"])
                     except (json.JSONDecodeError, TypeError):
-                        yield {"raw": msg["data"]}
-        except Exception as e:
-            logger.exception(f"Redis SUBSCRIBE error: {e}")
+                        yield {"raw": message["data"]}
+                else:
+                    await asyncio.sleep(0.01)
         finally:
             await pubsub.unsubscribe(channel)
             await pubsub.close()
