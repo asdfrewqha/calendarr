@@ -111,7 +111,7 @@ services:
     container_name: celery-container
     env_file:
       - /root/fastapi/.env
-    command: aio_celery -A app.core.celery_config:app worker --loglevel=info -P solo
+    command: aio_celery worker -l INFO app.core.celery_config:app
     depends_on:
       redis:
         condition: service_healthy
