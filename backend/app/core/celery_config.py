@@ -8,7 +8,7 @@ logger.info("Initializing Celery")
 app = Celery()
 
 app.conf.update(
-    broker=settings.rbmq.celery_url,
+    broker_url=settings.rbmq.celery_url,
     result_backend=settings.redis_settings.redis_url,
     task_serializer="json",
     result_serializer="json",
