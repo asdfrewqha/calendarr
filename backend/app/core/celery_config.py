@@ -3,17 +3,19 @@ from app.core.logging import get_logger
 from app.core.settings import settings
 
 logger = get_logger()
+logger.info(f"Initializing Celery with broker: {settings.rbmq.celery_url}")
 
-logger.info(settings.rbmq.celery_url)
+app = Celery(broker=settings.rbmq.celery_url, result_backend=settings.redis_settings.redis_url)
 
-app = Celery(main="app", broker=settings.rbmq.celery_url, backend=settings.redis_settings.redis_url)
-
-app.conf.task_serializer = "json"
-app.conf.result_serializer = "json"
-app.conf.accept_content = ["json"]
-
-app.conf.task_acks_late = True
-app.conf.worker_prefetch_multiplier = 1
-app.conf.broker_heartbeat = 60
+app.conf.update(
+    task_serializer="json",
+    result_serializer="json",
+    accept_content=["json"],
+    task_acks_late=True,
+    worker_prefetch_multiplier=1,
+    broker_heartbeat=60,
+    task_reject_on_worker_lost=True,
+)
 
 app.autodiscover_tasks(packages=["app.api.user"])
+logger.info("Celery configuration loaded successfully")
