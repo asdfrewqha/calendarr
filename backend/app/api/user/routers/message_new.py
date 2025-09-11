@@ -27,7 +27,7 @@ async def create_message(
     schedule_telegram_message.apply_async(args=[user.id, new_msg.id], eta=msg.end_send_date)
     if msg.start_send_date:
         schedule_telegram_message.apply_async(args=[user.id, new_msg.id], eta=msg.start_send_date)
-    msg_obj = MessageCreateScheme.model_validate(msg, from_attributes=True)
+    msg_obj = MessageCreateScheme.model_validate(new_msg, from_attributes=True)
     msg_obj.event = "message_created"
     msg_json = MessageCreateScheme.model_dump_json(msg_obj)
     await redis_adapter.publish(f"messages:{user.id}", msg_json)
