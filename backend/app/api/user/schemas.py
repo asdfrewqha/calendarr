@@ -16,6 +16,7 @@ class UserProfileResponse(BaseModel):
 
 
 class MessageCreateScheme(BaseModel):
+    event: str = None
     id: Optional[UUID] = None
     user_id: Optional[int] = None
     name: Optional[str] = None
@@ -29,7 +30,6 @@ class MessageCreateScheme(BaseModel):
     repeat: bool = False
     repeat_date: Optional[datetime] = None
     repeat_wd: Optional[list] = None
-    event: str = None
 
 
 class CreatedMessageResponse(BaseModel):
@@ -53,6 +53,7 @@ class MessageScheme(BaseModel):
 
 
 class MessageUpdateScheme(BaseModel):
+    event: str = None
     id: Optional[UUID] = None
     name: Optional[str] = None
     payload: Optional[dict] = None
@@ -64,4 +65,3 @@ class MessageUpdateScheme(BaseModel):
     repeat: bool = False
     repeat_date: Optional[datetime] = None
     repeat_wd: Optional[list] = None
-    event: str = None
