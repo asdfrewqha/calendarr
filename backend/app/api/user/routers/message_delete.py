@@ -7,6 +7,7 @@ from app.database.models import Message, User
 from app.database.session import get_async_session
 from app.dependencies.checks import check_user_token
 from app.dependencies.responses import emptyresponse
+from app.utils.redis_adapter import redis_adapter
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -20,4 +21,5 @@ async def list_message(
     msg_id: UUID,
 ):
     await adapter.delete(Message, msg_id, session)
+    await redis_adapter.publish(f"messages:{user.id}", {"event": "message_deleted", "id": msg_id})
     return emptyresponse()

@@ -7,6 +7,7 @@ from app.database.models import Message, User
 from app.database.session import get_async_session
 from app.dependencies.checks import check_user_token
 from app.dependencies.responses import okresponse
+from app.utils.redis_adapter import redis_adapter
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -22,4 +23,6 @@ async def update_message(
 ):
     msg_dict = MessageUpdateScheme.model_dump(msg, exclude_none=True, exclude_unset=True)
     await adapter.update_by_id(Message, msg_id, msg_dict, session)
+    msg_dict["event"] = "message_updated"
+    await redis_adapter.publish(f"messages:{user.id}", msg_dict)
     return okresponse()

@@ -6,6 +6,7 @@ from app.database.adapter import adapter
 from app.database.models import Message, User
 from app.database.session import get_async_session
 from app.dependencies.checks import check_user_token
+from app.utils.redis_adapter import redis_adapter
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -26,4 +27,6 @@ async def create_message(
     schedule_telegram_message.apply_async(args=[user.id, new_msg.id], eta=msg.end_send_date)
     if msg.start_send_date:
         schedule_telegram_message.apply_async(args=[user.id, new_msg.id], eta=msg.start_send_date)
+    msg_dict["event"] = "message_created"
+    await redis_adapter.publish(f"messages:{user.id}", msg_dict)
     return CreatedMessageResponse(id=new_msg.id)

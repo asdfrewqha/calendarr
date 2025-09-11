@@ -1,5 +1,5 @@
 import json
-from typing import Any, Optional
+from typing import Any, AsyncGenerator, Optional
 
 import redis.asyncio as redis
 from app.core.logging import get_logger
@@ -14,6 +14,7 @@ class AsyncRedisAdapter:
             settings.redis_settings.redis_url, decode_responses=decode_responses
         )
 
+    # ----------------- обычные методы -----------------
     async def set(self, key: str, value: Any, expire: Optional[int] = None) -> bool:
         try:
             if isinstance(value, (dict, list)):
@@ -56,6 +57,33 @@ class AsyncRedisAdapter:
             logger.exception(f"Redis EXPIRE error: {e}")
             return False
 
+    # ----------------- методы pub/sub -----------------
+    async def publish(self, channel: str, message: dict) -> bool:
+        try:
+            payload = json.dumps(message)
+            await self.redis.publish(channel, payload)
+            return True
+        except Exception as e:
+            logger.exception(f"Redis PUBLISH error: {e}")
+            return False
+
+    async def subscribe(self, channel: str) -> AsyncGenerator[dict, None]:
+        try:
+            pubsub = self.redis.pubsub()
+            await pubsub.subscribe(channel)
+            async for msg in pubsub.listen():
+                if msg["type"] == "message":
+                    try:
+                        yield json.loads(msg["data"])
+                    except (json.JSONDecodeError, TypeError):
+                        yield {"raw": msg["data"]}
+        except Exception as e:
+            logger.exception(f"Redis SUBSCRIBE error: {e}")
+        finally:
+            await pubsub.unsubscribe(channel)
+            await pubsub.close()
+
+    # ----------------- закрытие соединения -----------------
     async def close(self):
         await self.redis.close()
 
