@@ -1,3 +1,4 @@
+import json
 from typing import AsyncGenerator
 
 from app.database.models import User
@@ -11,6 +12,8 @@ router = APIRouter()
 
 async def event_generator(user_id: int) -> AsyncGenerator[str, None]:
     async for message in redis_adapter.subscribe(f"messages:{user_id}"):
+        if not isinstance(message, str):
+            message = json.dumps(message, default=str)  # datetime -> str
         yield f"data: {message}\n\n"
 
 
