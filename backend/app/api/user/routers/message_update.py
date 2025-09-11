@@ -24,6 +24,7 @@ async def update_message(
     msg_dict = MessageUpdateScheme.model_dump(msg, exclude_none=True, exclude_unset=True)
     await adapter.update_by_id(Message, msg_id, msg_dict, session)
     msg_obj = MessageUpdateScheme.model_validate(msg, from_attributes=True)
+    msg_obj.id = msg_id
     msg_obj.event = "message_updated"
     msg_json = MessageUpdateScheme.model_dump_json(msg_obj)
     await redis_adapter.publish(f"messages:{user.id}", msg_json)
