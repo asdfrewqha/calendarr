@@ -28,6 +28,7 @@ class MessageCreateScheme(BaseModel):
     repeat: bool = False
     repeat_date: Optional[datetime] = None
     repeat_wd: Optional[list] = None
+    event: str = None
 
 
 class CreatedMessageResponse(BaseModel):
@@ -61,3 +62,4 @@ class MessageUpdateScheme(BaseModel):
     repeat: bool = False
     repeat_date: Optional[datetime] = None
     repeat_wd: Optional[list] = None
+    event: str = None
