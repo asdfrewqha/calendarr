@@ -14,6 +14,6 @@ async def event_generator(user_id: int) -> AsyncGenerator[str, None]:
         yield f"data: {message}\n\n"
 
 
-@router.get("/message/stream")
+@router.get("/message-stream")
 async def message_stream(user: User = Depends(check_user_token)):
     return StreamingResponse(event_generator(user.id), media_type="text/event-stream")

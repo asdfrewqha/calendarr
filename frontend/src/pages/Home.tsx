@@ -11,43 +11,88 @@ export default function Home() {
   const [events, setEvents] = useState<any[]>([]);
   const [sortBy, setSortBy] = useState<SortOption>("date");
 
+  // --------------------- Функция загрузки событий ---------------------
+  const loadEvents = async () => {
+    let start: string;
+    let end: string | undefined;
+
+    if (Array.isArray(dateRange)) {
+      start = dateRange[0].toISOString().split("T")[0];
+      end = dateRange[1]?.toISOString().split("T")[0];
+    } else {
+      start = dateRange.toISOString().split("T")[0];
+      end = new Date(dateRange.getTime() + 24 * 60 * 60 * 1000)
+        .toISOString()
+        .split("T")[0];
+    }
+
+    const data = await getEvents(start, end);
+    let sorted = [...(data || [])];
+
+    if (sortBy === "priority") {
+      sorted.sort((a, b) => b.priority - a.priority);
+    } else {
+      sorted.sort(
+        (a, b) =>
+          new Date(a.end_send_date).getTime() -
+          new Date(b.end_send_date).getTime()
+      );
+    }
+
+    setEvents(sorted);
+  };
+
+  // --------------------- Первичная загрузка и при смене фильтров ---------------------
   useEffect(() => {
-    const load = async () => {
-      let start: string;
-      let end: string | undefined;
-
-      if (Array.isArray(dateRange)) {
-        start = dateRange[0].toISOString().split("T")[0];
-        end = dateRange[1]?.toISOString().split("T")[0];
-      } else {
-        start = dateRange.toISOString().split("T")[0];
-        end = new Date(dateRange.getTime() + 24 * 60 * 60 * 1000)
-          .toISOString()
-          .split("T")[0];
-      }
-
-      const data = await getEvents(start, end);
-      let sorted = [...(data || [])];
-
-      if (sortBy === "priority") {
-        sorted.sort((a, b) => b.priority - a.priority);
-      } else {
-        sorted.sort(
-          (a, b) =>
-            new Date(a.end_send_date).getTime() -
-            new Date(b.end_send_date).getTime()
-        );
-      }
-
-      setEvents(sorted);
-    };
-    load();
+    loadEvents();
   }, [dateRange, sortBy]);
 
+  // --------------------- SSE подписка ---------------------
+  useEffect(() => {
+    const evtSource = new EventSource(`${import.meta.env.VITE_API_URL}/message-stream`, { withCredentials: true });
+
+    evtSource.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+
+      setEvents((prev) => {
+        switch (data.event) {
+          case "message_created":
+            // Добавляем новое событие, если оно ещё не в списке
+            if (!prev.find((e) => e.id === data.id)) {
+              return [...prev, data].sort((a, b) =>
+                sortBy === "priority"
+                  ? b.priority - a.priority
+                  : new Date(a.end_send_date).getTime() - new Date(b.end_send_date).getTime()
+              );
+            }
+            return prev;
+
+          case "message_updated":
+            // Обновляем существующее событие
+            return prev
+              .map((e) => (e.id === data.id ? { ...e, ...data } : e))
+              .sort((a, b) =>
+                sortBy === "priority"
+                  ? b.priority - a.priority
+                  : new Date(a.end_send_date).getTime() - new Date(b.end_send_date).getTime()
+              );
+
+          case "message_deleted":
+            // Удаляем событие
+            return prev.filter((e) => e.id !== data.id);
+
+          default:
+            return prev;
+        }
+      });
+    };
+
+    return () => evtSource.close();
+  }, [sortBy]); // пересортировка при смене сортировки
+
+  // --------------------- Текст выбранного диапазона ---------------------
   const selectedDateText = Array.isArray(dateRange)
-    ? `${dateRange[0].toLocaleDateString()} — ${
-        dateRange[1]?.toLocaleDateString() || ""
-      }`
+    ? `${dateRange[0].toLocaleDateString()} — ${dateRange[1]?.toLocaleDateString() || ""}`
     : dateRange.toLocaleDateString();
 
   return (
@@ -55,12 +100,11 @@ export default function Home() {
       {/* Календарь */}
       <div className="bg-gray-800 p-3 rounded-xl shadow">
         <Calendar
-            onChange={(value) => setDateRange(value as Date | [Date, Date])}
-            value={dateRange as Date | [Date, Date]}
-            selectRange={true}
-            className="rounded-xl text-black"
+          onChange={(value) => setDateRange(value as Date | [Date, Date])}
+          value={dateRange as Date | [Date, Date]}
+          selectRange={true}
+          className="rounded-xl text-black"
         />
-
       </div>
 
       {/* Фильтры */}
@@ -83,17 +127,16 @@ export default function Home() {
 
       <div className="space-y-2">
         {events.map((event) => (
-            <EventCard
-                key={event.id}
-                id={event.id}
-                title={event.title}
-                date={event.end_send_date}
-                description={event.description}
-                type={event.type}
-                priority={event.priority}
-            />
+          <EventCard
+            key={event.id}
+            id={event.id}
+            title={event.title}
+            date={event.end_send_date}
+            description={event.description}
+            type={event.type}
+            priority={event.priority}
+          />
         ))}
-
       </div>
     </div>
   );
