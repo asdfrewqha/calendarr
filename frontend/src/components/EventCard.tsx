@@ -23,7 +23,7 @@ export default function EventCard({
   payload,
   type,
   priority,
-  is_active = true,
+  is_active,
   onDeleted,
 }: Props) {
   const [error, setError] = useState<string | null>(null);
@@ -74,7 +74,7 @@ export default function EventCard({
       const lines = payload.description.split("\n").slice(0, 2);
       return lines.join("\n");
     }
-    return "нет";
+    return "Описания нет";
   };
 
   const renderArrayFull = () => {
@@ -85,7 +85,7 @@ export default function EventCard({
           <div
             key={key}
             className={`px-2 py-1 rounded cursor-pointer text-xs font-medium ${
-              val ? "bg-blue-500 text-white" : "bg-gray-700 text-gray-300"
+              val ? "bg-blue-500 text-white" : "bg-gray-300 text-gray-700"
             }`}
             onClick={() => toggleTask(i, key)}
           >
@@ -99,54 +99,52 @@ export default function EventCard({
   return (
     <div
       className={`rounded-xl border shadow-sm transition-all duration-300 ease-in-out overflow-hidden ${
-        is_active ? "border-gray-700 bg-gray-800" : "border-gray-700 bg-gray-900 opacity-70"
+        is_active
+          ? "border-gray-700 bg-gray-800 text-gray-100"
+          : "border-gray-500 bg-gray-100 text-gray-700"
       }`}
     >
       {error && (
-        <div className="mb-3 rounded bg-gray-900 text-gray-100 px-3 py-2 text-sm">
+        <div className="mb-3 rounded bg-gray-200 text-gray-700 px-3 py-2 text-sm">
           ⚠️ {error}
         </div>
       )}
 
-      {/* Верхняя часть */}
-      <div className="p-4">
-        <div className="flex justify-between items-start">
-          <h3 className="font-semibold text-lg text-gray-100">{name}</h3>
-          <span className="text-sm text-gray-400">
-            {new Date(date).toLocaleString("ru-RU", {
-              day: "2-digit",
-              month: "short",
-              hour: "2-digit",
-              minute: "2-digit",
-            })}
-          </span>
+      {/* Верхняя часть с индикатором активности */}
+      <div className="p-4 flex justify-between items-center">
+        <div className="flex items-center gap-2">
+          <div
+            className={`w-3 h-3 rounded-full ${
+              is_active ? "bg-green-500" : "bg-red-500"
+            }`}
+          ></div>
+          <h3 className="font-semibold text-lg">{name}</h3>
         </div>
-
-        {/* Превью скрывается при развороте */}
-        {!expanded && (
-          <p className="mt-2 text-gray-300 whitespace-pre-wrap">{renderPreview()}</p>
-        )}
+        <span className="text-sm">
+          {new Date(date).toLocaleString("ru-RU", {
+            day: "2-digit",
+            month: "short",
+            hour: "2-digit",
+            minute: "2-digit",
+          })}
+        </span>
       </div>
 
-      {/* Кнопка разворота */}
-      <div
-        className="cursor-pointer bg-gray-700 hover:bg-gray-600 transition p-4 text-center text-gray-200 font-medium select-none"
-        onClick={() => setExpanded(!expanded)}
-      >
-        {expanded ? "Свернуть" : "Развернуть"}
-      </div>
+      {/* Превью, если не развёрнуто */}
+      {!expanded && (
+        <div className="px-4 pb-4">
+          <p className="whitespace-pre-wrap">{renderPreview()}</p>
+        </div>
+      )}
 
-      {/* Развёрнутое содержимое с анимацией */}
+      {/* Развёрнутое содержимое */}
       <div
         className={`transition-all duration-500 ease-in-out overflow-hidden ${
           expanded ? "max-h-[1000px] opacity-100" : "max-h-0 opacity-0"
         }`}
       >
-        <div className="p-4 max-w-3xl mx-auto flex flex-col gap-4 text-gray-200">
-          {/* Описание */}
+        <div className="p-4 max-w-3xl mx-auto flex flex-col gap-4">
           <span className="text-left">{payload?.description ?? "Описания нет"}</span>
-
-          {/* Список задач */}
           {arrayState.length > 0 && (
             <div className="text-left">
               <span className="font-medium block mb-2">Список задач:</span>
@@ -156,41 +154,53 @@ export default function EventCard({
         </div>
       </div>
 
-      {/* Кнопки и метки */}
-      <div className="mt-3 flex flex-col items-center gap-3 p-4">
-        <div className="flex flex-wrap gap-2 justify-center">
-          {type && (
-            <span className="px-2 py-1 rounded bg-gray-700 text-gray-300 text-sm">
-              {MessageTypeLabel[type]}
-            </span>
-          )}
-          {priority !== undefined && (
-            <span className="px-2 py-1 rounded bg-gray-700 text-gray-300 text-sm">
-              Приоритет {priority}
-            </span>
-          )}
-        </div>
+      {/* Кнопка разворота */}
+      <div
+        className={`cursor-pointer transition p-4 text-center font-medium select-none ${
+          is_active ? "bg-gray-700 hover:bg-gray-600 text-gray-100" : "bg-gray-200 text-gray-700"
+        }`}
+        onClick={() => setExpanded(!expanded)}
+      >
+        {expanded ? "Свернуть" : "Развернуть"}
+      </div>
 
-        <div className="flex gap-4 justify-center">
-          <Link
-            to={`/edit/${id}`}
-            className={`text-sm font-medium ${
-              is_active ? "text-blue-400 hover:underline" : "text-gray-500 cursor-not-allowed"
+      {/* Лейблы типа/приоритета */}
+      <div className="flex flex-wrap gap-2 justify-center mt-2 p-2">
+        {type && (
+          <span
+            className={`px-2 py-1 rounded text-sm font-medium ${
+              is_active ? "bg-gray-700 text-gray-300" : "bg-gray-200 text-gray-500"
             }`}
           >
-            ✏️ Редактировать
-          </Link>
-
-          <button
-            onClick={handleDelete}
-            className={`text-sm font-medium ${
-              is_active ? "text-red-400 hover:underline" : "text-gray-500 cursor-not-allowed"
+            {MessageTypeLabel[type]}
+          </span>
+        )}
+        {priority !== undefined && (
+          <span
+            className={`px-2 py-1 rounded text-sm font-medium ${
+              is_active ? "bg-gray-700 text-gray-300" : "bg-gray-200 text-gray-500"
             }`}
-            disabled={!is_active}
           >
-            🗑️ Удалить
-          </button>
-        </div>
+            Приоритет {priority}
+          </span>
+        )}
+      </div>
+
+      {/* Кнопки редактировать/удалить */}
+      <div className="flex gap-4 justify-center mb-4">
+        <Link
+          to={`/edit/${id}`}
+          className="text-sm font-medium text-blue-400 hover:underline"
+        >
+          ✏️ Редактировать
+        </Link>
+
+        <button
+          onClick={handleDelete}
+          className="text-sm font-medium text-red-400 hover:underline"
+        >
+          🗑️ Удалить
+        </button>
       </div>
     </div>
   );

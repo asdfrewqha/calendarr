@@ -20,7 +20,7 @@ async def list_message(
     end_date: Optional[date] = Query(None),
 ):
     if start_date:
-        start_date = datetime.combine(start_date, time()).replace(tzinfo=timezone.utc)
+        start_date = datetime.combine(start_date, time(0, 0, 0)).replace(tzinfo=timezone.utc)
     if end_date:
         end_date = datetime.combine(end_date, time(23, 59, 59)).replace(tzinfo=timezone.utc)
         list_messages = await adapter.get_by_cond(
