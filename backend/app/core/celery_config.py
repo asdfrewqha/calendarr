@@ -3,11 +3,13 @@ from app.core.logging import get_logger
 from app.core.settings import settings
 
 logger = get_logger()
-logger.info(f"Initializing Celery with broker: {settings.rbmq.celery_url}")
+logger.info("Initializing Celery")
 
-app = Celery(broker=settings.rbmq.celery_url, result_backend=settings.redis_settings.redis_url)
+app = Celery()
 
 app.conf.update(
+    broker=settings.rbmq.celery_url,
+    result_backend=settings.redis_settings.redis_url,
     task_serializer="json",
     result_serializer="json",
     accept_content=["json"],
