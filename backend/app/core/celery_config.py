@@ -10,13 +10,6 @@ app = Celery()
 app.conf.update(
     broker_url=settings.rbmq.celery_url,
     result_backend=settings.redis_settings.redis_url,
-    task_serializer="json",
-    result_serializer="json",
-    accept_content=["json"],
-    task_acks_late=True,
-    worker_prefetch_multiplier=1,
-    broker_heartbeat=60,
-    task_reject_on_worker_lost=True,
 )
 
 app.autodiscover_tasks(packages=["app.api.user"])
