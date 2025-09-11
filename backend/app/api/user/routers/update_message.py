@@ -13,7 +13,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 router = APIRouter()
 
 
-@router.patch("/update-msg/{msg_id}")
+@router.patch("/message/{msg_id}")
 async def update_message(
     msg: MessageUpdateScheme,
     msg_id: UUID,

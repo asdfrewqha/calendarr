@@ -15,7 +15,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 router = APIRouter()
 
 
-@router.get("/check-notific/{msg_id}")
+@router.get("/message/notification/{msg_id}")
 async def check_notifications(
     user: Annotated[User, Depends(check_user_token)],
     msg_id: UUID,

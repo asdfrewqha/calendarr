@@ -49,9 +49,7 @@ async def get_access_cookies(chat_id: int, chat_username: str = None):
         async with aiohttp.ClientSession() as session:
             headers = {"Content-Type": "application/x-www-form-urlencoded"}
             data = {"initData": init_data}
-            async with session.post(
-                f"{BACKEND_URL}/get-token", data=data, headers=headers
-            ) as response:
+            async with session.post(f"{BACKEND_URL}/login", data=data, headers=headers) as response:
                 if response.status != 200:
                     raise Exception(f"Token request failed: {response.status}")
                 cookies = {}
@@ -64,7 +62,7 @@ async def get_access_cookies(chat_id: int, chat_username: str = None):
 async def check_notifications(chat_id: int, msg_id: UUID):
     cookies = await get_access_cookies(chat_id=chat_id)
     async with aiohttp.ClientSession(cookies=cookies) as session:
-        async with session.get(f"{BACKEND_URL}/check-notific/{msg_id}") as resp:
+        async with session.get(f"{BACKEND_URL}/message/notification/{msg_id}") as resp:
             if resp.status == 200:
                 return await resp.json()
             elif resp.status == 204:

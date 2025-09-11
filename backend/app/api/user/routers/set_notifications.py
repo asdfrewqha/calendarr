@@ -9,7 +9,7 @@ from fastapi import APIRouter, Depends
 router = APIRouter()
 
 
-@router.get("/set-notific/")
+@router.get("/user-notification/")
 async def check_notifications(user: Annotated[User, Depends(check_user_token)]):
     await adapter.update_by_id(User, user.id, {"notifications_bool": not user.notifications_bool})
     return emptyresponse(200)

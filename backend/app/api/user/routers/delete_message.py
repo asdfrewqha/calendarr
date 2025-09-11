@@ -13,7 +13,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 router = APIRouter()
 
 
-@router.delete("/del-msg/{msg_id}", response_model=MessageScheme)
+@router.delete("/message/{msg_id}", response_model=MessageScheme)
 async def list_message(
     user: Annotated[User, Depends(check_user_token)],
     session: Annotated[AsyncSession, Depends(get_async_session)],

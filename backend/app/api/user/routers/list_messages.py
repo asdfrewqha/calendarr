@@ -12,7 +12,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 router = APIRouter()
 
 
-@router.get("/list-msg")
+@router.get("/message")
 async def list_message(
     user: Annotated[User, Depends(check_user_token)],
     session: Annotated[AsyncSession, Depends(get_async_session)],

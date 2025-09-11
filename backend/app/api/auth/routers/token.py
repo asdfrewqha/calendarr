@@ -14,7 +14,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 router = APIRouter()
 
 
-@router.post("/get-token")
+@router.post("/login")
 async def telegram_auth(
     session: Annotated[AsyncSession, Depends(get_async_session)], initData: str = Form(...)
 ):

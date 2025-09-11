@@ -12,7 +12,7 @@ export default function App() {
     const params = new URLSearchParams();
     params.append("initData", initData);
 
-    fetch(import.meta.env.VITE_API_URL + "/get-token", {
+    fetch(import.meta.env.VITE_API_URL + "/login", {
       method: "POST",
       headers: {
           "Content-Type": "application/x-www-form-urlencoded",

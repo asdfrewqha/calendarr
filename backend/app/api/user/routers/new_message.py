@@ -12,7 +12,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 router = APIRouter()
 
 
-@router.post("/create-msg", response_model=CreatedMessageResponse)
+@router.post("/message", response_model=CreatedMessageResponse)
 async def create_message(
     msg: MessageCreateScheme,
     user: Annotated[User, Depends(check_user_token)],
