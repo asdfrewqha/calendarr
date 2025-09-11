@@ -3,6 +3,7 @@
 @tailwind components;
 @tailwind utilities;
 
+
 /* Базовый стиль календаря */
 .react-calendar {
   background-color: #1f2937; /* bg-gray-800 */

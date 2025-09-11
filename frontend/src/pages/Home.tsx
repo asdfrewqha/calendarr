@@ -4,12 +4,36 @@ import "react-calendar/dist/Calendar.css";
 import { getEvents } from "../api/events";
 import EventCard from "../components/EventCard";
 
-type SortOption = "date" | "priority";
+type SortOption = "date-asc" | "date-desc" | "priority-asc" | "priority-desc";
 
 export default function Home() {
   const [dateRange, setDateRange] = useState<Date | Date[]>(new Date());
   const [events, setEvents] = useState<any[]>([]);
-  const [sortBy, setSortBy] = useState<SortOption>("date");
+  const [sortBy, setSortBy] = useState<SortOption>("date-asc");
+
+  // --------------------- Функция сортировки ---------------------
+  const sortEvents = (arr: any[], sortBy: SortOption) => {
+    return [...arr].sort((a, b) => {
+      switch (sortBy) {
+        case "priority-asc":
+          return a.priority - b.priority;
+        case "priority-desc":
+          return b.priority - a.priority;
+        case "date-asc":
+          return (
+            new Date(a.end_send_date).getTime() -
+            new Date(b.end_send_date).getTime()
+          );
+        case "date-desc":
+          return (
+            new Date(b.end_send_date).getTime() -
+            new Date(a.end_send_date).getTime()
+          );
+        default:
+          return 0;
+      }
+    });
+  };
 
   // --------------------- Функция загрузки событий ---------------------
   const loadEvents = async () => {
@@ -27,19 +51,7 @@ export default function Home() {
     }
 
     const data = await getEvents(start, end);
-    let sorted = [...(data || [])];
-
-    if (sortBy === "priority") {
-      sorted.sort((a, b) => b.priority - a.priority);
-    } else {
-      sorted.sort(
-        (a, b) =>
-          new Date(a.end_send_date).getTime() -
-          new Date(b.end_send_date).getTime()
-      );
-    }
-
-    setEvents(sorted);
+    setEvents(sortEvents(data || [], sortBy));
   };
 
   // --------------------- Первичная загрузка и при смене фильтров ---------------------
@@ -49,7 +61,10 @@ export default function Home() {
 
   // --------------------- SSE подписка ---------------------
   useEffect(() => {
-    const evtSource = new EventSource(`${import.meta.env.VITE_API_URL}/message-stream`, { withCredentials: true });
+    const evtSource = new EventSource(
+      `${import.meta.env.VITE_API_URL}/message-stream`,
+      { withCredentials: true }
+    );
 
     evtSource.onmessage = (event) => {
       const data = JSON.parse(event.data);
@@ -57,28 +72,26 @@ export default function Home() {
       setEvents((prev) => {
         switch (data.event) {
           case "message_created":
-            // Добавляем новое событие, если оно ещё не в списке
             if (!prev.find((e) => e.id === data.id)) {
-              return [...prev, data].sort((a, b) =>
-                sortBy === "priority"
-                  ? b.priority - a.priority
-                  : new Date(a.end_send_date).getTime() - new Date(b.end_send_date).getTime()
-              );
+              return sortEvents([...prev, data], sortBy);
             }
             return prev;
 
           case "message_updated":
-            // Обновляем существующее событие
-            return prev
-              .map((e) => (e.id === data.id ? { ...e, ...data } : e))
-              .sort((a, b) =>
-                sortBy === "priority"
-                  ? b.priority - a.priority
-                  : new Date(a.end_send_date).getTime() - new Date(b.end_send_date).getTime()
-              );
+            return sortEvents(
+              prev.map((e) => {
+                if (e.id !== data.id) return e;
+                const cleanData = Object.fromEntries(
+                  Object.entries(data).filter(
+                    ([_, v]) => v !== null && v !== undefined
+                  )
+                );
+                return { ...e, ...cleanData };
+              }),
+              sortBy
+            );
 
           case "message_deleted":
-            // Удаляем событие
             return prev.filter((e) => e.id !== data.id);
 
           default:
@@ -88,11 +101,13 @@ export default function Home() {
     };
 
     return () => evtSource.close();
-  }, [sortBy]); // пересортировка при смене сортировки
+  }, [sortBy]);
 
   // --------------------- Текст выбранного диапазона ---------------------
   const selectedDateText = Array.isArray(dateRange)
-    ? `${dateRange[0].toLocaleDateString()} — ${dateRange[1]?.toLocaleDateString() || ""}`
+    ? `${dateRange[0].toLocaleDateString()} — ${
+        dateRange[1]?.toLocaleDateString() || ""
+      }`
     : dateRange.toLocaleDateString();
 
   return (
@@ -115,8 +130,10 @@ export default function Home() {
           onChange={(e) => setSortBy(e.target.value as SortOption)}
           className="bg-gray-700 text-white rounded p-2"
         >
-          <option value="date">По дате</option>
-          <option value="priority">По важности</option>
+          <option value="date-asc">Дата ↑</option>
+          <option value="date-desc">Дата ↓</option>
+          <option value="priority-asc">Приоритет ↑</option>
+          <option value="priority-desc">Приоритет ↓</option>
         </select>
       </div>
 
@@ -130,12 +147,14 @@ export default function Home() {
           <EventCard
             key={event.id}
             id={event.id}
-            title={event.title}
+            name={event.name}
             date={event.end_send_date}
-            description={event.description}
+            payload={event.payload}
             type={event.type}
             priority={event.priority}
-            onDeleted={(id) => setEvents((prev) => prev.filter((e) => e.id !== id))}
+            onDeleted={(id) =>
+              setEvents((prev) => prev.filter((e) => e.id !== id))
+            }
           />
         ))}
       </div>

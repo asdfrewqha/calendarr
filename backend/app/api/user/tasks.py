@@ -1,4 +1,3 @@
-import asyncio
 import json
 from uuid import UUID
 
@@ -10,17 +9,16 @@ from app.core.settings import settings
 async def publish_message(message: dict):
     connection = await aio_pika.connect_robust(settings.rbmq.celery_url)
     channel = await connection.channel()
+    queue = await channel.declare_queue("telegram_queue", durable=True)  # noqa
     await channel.default_exchange.publish(
-        aio_pika.Message(body=json.dumps(message).encode()), routing_key="telegram_queue"
+        aio_pika.Message(
+            body=json.dumps(message).encode(), delivery_mode=aio_pika.DeliveryMode.PERSISTENT
+        ),
+        routing_key="telegram_queue",
     )
     await connection.close()
 
 
 @app.task
-def schedule_telegram_message(chat_id: int, msg_id: UUID):
-    asyncio.run(publish_message({"chat_id": chat_id, "msg_id": str(msg_id)}))
-
-
-@app.task
-def send_msg(chat_id: int, text: str):
-    asyncio.run(publish_message({"chat_id": chat_id, "text": text}))
+async def schedule_telegram_message(chat_id: int, msg_id: UUID):
+    await publish_message({"chat_id": chat_id, "msg_id": str(msg_id)})

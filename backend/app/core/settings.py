@@ -45,10 +45,6 @@ class RabbitMQSettings(BaseSettings):
     def celery_url(self):
         return f"amqp://{self.rabbitmq_user}:{self.rabbitmq_password.get_secret_value()}@rabbitmq:5672/"
 
-    @property
-    def celery_back_url(self):
-        return "rpc://"
-
 
 class Settings(BaseSettings):
     db_settings: DBSettings = DBSettings()

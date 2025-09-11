@@ -36,10 +36,6 @@ async def check_notifications(
         if msg.repeat:
             if msg.repeat_date:
                 schedule_telegram_message.apply_async(args=[user.id, msg.id], eta=msg.repeat_date)
-                if msg.send_start:
-                    schedule_telegram_message.apply_async(
-                        args=[user.id, msg.id], eta=msg.repeat_date + timedelta(hours=24)
-                    )
                 await adapter.update_by_id(Message, msg_id, {"repeat": False}, session)
             elif msg.repeat_wd:
                 schedule_telegram_message.apply_async(

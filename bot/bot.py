@@ -13,36 +13,50 @@ logger = logging.getLogger(__name__)
 
 
 async def on_message(message: aio_pika.IncomingMessage):
-    async with message.process():
-        data = json.loads(message.body)
-        chat_id = data["chat_id"]
-        msg_id = data.get("msg_id")
+    try:
+        async with message.process(ignore_processed=True):
+            data = json.loads(message.body)
+            chat_id = data["chat_id"]
+            msg_id = data.get("msg_id")
 
-        payload = await check_notifications(chat_id=chat_id, msg_id=UUID(msg_id))
+            payload = await check_notifications(chat_id=chat_id, msg_id=UUID(msg_id))
 
-        start = payload.get("start_notification", False)
-        priority = payload.get("priority", "Unknown")
-        name = payload.get("name")
+            start = payload.get("start_notification", False)
+            priority = payload.get("priority", "Unknown")
+            name = payload.get("name")
 
-        header = f"<b>{name}</b>\n" if name else ""
-        priority_text = f"Приоритет: {priority}\n"
-        start_text = "Это первое напоминание.\n" if start else ""
+            header = f"<b>{name}</b>\n" if name else ""
+            priority_text = f"Приоритет: {priority}\n"
+            start_text = "Это первое напоминание.\n" if start else ""
 
-        if payload.get("description"):
-            content = f"Сообщение:\n{payload['description']}\n"
-        else:
-            content = ""
-        if payload.get("array"):
-            content = "Список:\n"
-            for item in payload["array"]:
-                for key, val in item.items():
-                    indicator = "✅" if val else "❎"
-                    content += f"{key}: {indicator}\n"
-            content += "\n"
+            if payload.get("description"):
+                content = f"Сообщение:\n{payload['description']}\n"
+            else:
+                content = ""
+            if payload.get("array"):
+                content = "Список:\n"
+                for item in payload["array"]:
+                    for key, val in item.items():
+                        indicator = "✅" if val else "❎"
+                        content += f"{key}: {indicator}\n"
+                content += "\n"
 
-        text = f"{header}Ваше напоминание.\n{priority_text}{content}{start_text}"
+            text = f"{header}Ваше напоминание.\n{priority_text}{content}{start_text}"
 
-        await send_md_message(chat_id=chat_id, text=text)
+            await send_md_message(chat_id=chat_id, text=text)
+
+    except Exception as e:
+        logger.exception(f"Ошибка при обработке сообщения: {e}")
+        message.nack(requeue=True)
+
+
+async def start_rabbitmq_listener():
+    connection = await aio_pika.connect_robust(RABBITMQ_URL)
+    channel = await connection.channel()
+    await channel.set_qos(prefetch_count=1)
+    queue = await channel.declare_queue("telegram_queue", durable=True)
+    await queue.consume(on_message)
+    logger.info("[*] Waiting for messages")
 
 
 async def connect_with_retry(url, retries=10, delay=5):
@@ -54,14 +68,6 @@ async def connect_with_retry(url, retries=10, delay=5):
             logger.warning(f"Attempt {attempt} failed: {e}")
             await asyncio.sleep(delay)
     raise RuntimeError("Could not connect to RabbitMQ after retries")
-
-
-async def start_rabbitmq_listener():
-    connection = await connect_with_retry(RABBITMQ_URL)
-    channel = await connection.channel()
-    queue = await channel.declare_queue("telegram_queue", durable=True)
-    await queue.consume(on_message)
-    logger.info("[*] Waiting for messages")
 
 
 async def start_bot():
