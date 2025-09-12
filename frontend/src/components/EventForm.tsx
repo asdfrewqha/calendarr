@@ -264,7 +264,7 @@ export default function EventForm({
           checked={hasStart}
           onChange={(e) => setHasStart(e.target.checked)}
         />
-        Выключить дату начала
+        Включить дату начала
       </label>
 
       {/* Дата окончания */}

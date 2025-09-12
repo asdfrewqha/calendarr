@@ -22,9 +22,14 @@ async def publish_message(message: dict):
     connection = await get_connection()
     channel = await connection.channel()
 
-    queue = await channel.declare_queue(
-        "telegram_queue", durable=True, arguments={"x-message-ttl": 3600000, "x-queue-mode": "lazy"}
-    )
+    try:
+        await channel.declare_queue(
+            "telegram_queue",
+            durable=True,
+            arguments={"x-message-ttl": 3600000, "x-queue-mode": "lazy"},
+        )
+    except aio_pika.exceptions.ChannelPreconditionFailed:
+        pass
 
     await channel.default_exchange.publish(
         aio_pika.Message(
