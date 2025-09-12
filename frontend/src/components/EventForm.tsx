@@ -59,9 +59,7 @@ export default function EventForm({
     initialData?.startTime ?? getCurrentTime()
   );
 
-  const [endDate, setEndDate] = useState(
-    initialData?.endDate ?? new Date()
-  );
+  const [endDate, setEndDate] = useState(initialData?.endDate ?? new Date());
   const [endTime, setEndTime] = useState(
     initialData?.endTime ?? getCurrentTime()
   );
@@ -136,8 +134,11 @@ export default function EventForm({
   const handleSubmit = () => {
     const payload: EventFormData["payload"] =
       type === MessageType.ARRAY
-        ? { array: tasks.map((t) => ({ [t.text]: t.completed })) }
-        : description
+        ? {
+            description: description || undefined,
+            array: tasks.map((t) => ({ [t.text]: t.completed })),
+          }
+        : type !== MessageType.ALARM && description
         ? { description }
         : undefined;
 
@@ -186,15 +187,17 @@ export default function EventForm({
         onChange={(e) => setName(e.target.value)}
       />
 
-      {/* Описание */}
-      <textarea
-        placeholder="Описание"
-        className="w-full p-2 rounded bg-gray-700"
-        value={description}
-        onChange={(e) => setDescription(e.target.value)}
-      />
+      {/* Описание (нет у ALARM) */}
+      {type !== MessageType.ALARM && (
+        <textarea
+          placeholder="Описание"
+          className="w-full p-2 rounded bg-gray-700"
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+        />
+      )}
 
-      {/* Список задач */}
+      {/* Список задач (ARRAY) */}
       {type === MessageType.ARRAY && (
         <div className="bg-gray-900 p-2 rounded space-y-2">
           <h4 className="font-medium">Список задач</h4>
@@ -249,7 +252,10 @@ export default function EventForm({
       {hasStart && (
         <div className="bg-gray-900 p-2 rounded space-y-2">
           <label className="block font-medium">Дата начала</label>
-          <Calendar onChange={(v) => handleStartDateChange(v as Date)} value={startDate} />
+          <Calendar
+            onChange={(v) => handleStartDateChange(v as Date)}
+            value={startDate}
+          />
           <input
             type="time"
             className="p-1 rounded mt-1 bg-gray-700"
@@ -270,7 +276,10 @@ export default function EventForm({
       {/* Дата окончания */}
       <div className="bg-gray-900 p-2 rounded space-y-2">
         <label className="block font-medium">Дата окончания</label>
-        <Calendar onChange={(v) => handleEndDateChange(v as Date)} value={endDate} />
+        <Calendar
+          onChange={(v) => handleEndDateChange(v as Date)}
+          value={endDate}
+        />
         <input
           type="time"
           className="p-1 rounded mt-1 bg-gray-700"
@@ -283,7 +292,10 @@ export default function EventForm({
       {repeatMode === "once" && (
         <div className="bg-gray-900 p-2 rounded space-y-2">
           <label className="block font-medium">Дата повторения</label>
-          <Calendar onChange={(v) => handleRepeatDateChange(v as Date)} value={repeatDate} />
+          <Calendar
+            onChange={(v) => handleRepeatDateChange(v as Date)}
+            value={repeatDate}
+          />
           <input
             type="time"
             className="p-1 rounded mt-1 bg-gray-700"
@@ -303,7 +315,9 @@ export default function EventForm({
                 key={i}
                 type="button"
                 className={`px-2 py-1 rounded ${
-                  daysOfWeek.includes(i) ? "bg-blue-500 text-white" : "bg-gray-700"
+                  daysOfWeek.includes(i)
+                    ? "bg-blue-500 text-white"
+                    : "bg-gray-700"
                 }`}
                 onClick={() => toggleDay(i)}
               >

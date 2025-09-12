@@ -34,7 +34,7 @@ async def on_message(message: aio_pika.IncomingMessage):
             else:
                 content = ""
             if payload.get("array"):
-                content = "Список:\n"
+                content += "Список:\n"
                 for item in payload["array"]:
                     for key, val in item.items():
                         indicator = "✅" if val else "❎"

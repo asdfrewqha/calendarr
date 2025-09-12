@@ -16,7 +16,7 @@ export default function Home() {
   // --------------------- Получение профиля ---------------------
   const loadProfile = async () => {
     try {
-      const res = await fetch("/profile", { credentials: "include" });
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/profile`, { credentials: "include" });
       const data = await res.json();
       setNotificationsEnabled(data.notifications_bool);
     } catch (err) {
@@ -32,7 +32,7 @@ export default function Home() {
   const toggleNotifications = async () => {
     setLoadingToggle(true);
     try {
-      await fetch("/user-notification/", { credentials: "include" });
+      await fetch(`${import.meta.env.VITE_API_URL}/user-notification/`, { credentials: "include" });
       setNotificationsEnabled((prev) => !prev);
     } catch (err) {
       console.error("Ошибка переключения уведомлений:", err);
