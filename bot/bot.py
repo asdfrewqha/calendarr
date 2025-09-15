@@ -3,7 +3,7 @@ import logging
 
 from aiogram import Bot, Dispatcher
 from aiogram.types import BotCommand
-from core.broker import broker
+from core.broker import scheduler
 from core.config import BOT_TOKEN
 from core.handlers import router
 
@@ -18,13 +18,13 @@ async def on_startup(bot: Bot):
             BotCommand(command="start", description="Запустить мини-приложение"),
         ]
     )
-    await broker.startup()
+    await scheduler.startup()
     logger.info("Bot started successfully")
 
 
 async def on_shutdown(bot: Bot):
     logger.info("Shutting down bot...")
-    await broker.shutdown()
+    await scheduler.shutdown()
     await bot.session.close()
     logger.info("Bot shutdown complete")
 
