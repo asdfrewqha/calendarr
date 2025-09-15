@@ -1,9 +1,8 @@
 from uuid import UUID
 
-from core.broker import broker
 from utils.api_dependencies import check_notifications
 
-from bot import bot
+from bot import bot, broker
 
 
 @broker.task

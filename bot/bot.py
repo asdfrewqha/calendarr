@@ -3,9 +3,20 @@ import logging
 
 from aiogram import Bot, Dispatcher
 from aiogram.types import BotCommand
-from core.broker import scheduler
-from core.config import BOT_TOKEN
+from core.config import BOT_TOKEN, REDIS_URL
 from core.handlers import router
+from taskiq import TaskiqScheduler
+from taskiq_redis import (
+    ListRedisScheduleSource,
+    RedisAsyncResultBackend,
+    RedisStreamBroker,
+)
+
+broker = RedisStreamBroker(url=REDIS_URL).with_result_backend(RedisAsyncResultBackend(REDIS_URL))
+
+source = ListRedisScheduleSource(REDIS_URL, "telegram_queue")
+scheduler = TaskiqScheduler(broker, [source])
+
 
 logger = logging.getLogger(__name__)
 dp = Dispatcher()
