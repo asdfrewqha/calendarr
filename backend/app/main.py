@@ -1,6 +1,7 @@
 # main.py
 from contextlib import asynccontextmanager
 
+from app.core.broker import scheduler
 from app.core.log_middleware import LoggingMiddleware
 from app.core.logging import setup_logging
 from app.core.routers_loader import include_all_routers
@@ -13,6 +14,7 @@ from fastapi.responses import RedirectResponse
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    await scheduler.startup()
     await adapter.initialize_tables()
     yield
 

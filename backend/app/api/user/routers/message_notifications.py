@@ -2,13 +2,13 @@ from datetime import timedelta
 from typing import Annotated
 from uuid import UUID
 
-from app.api.user.tasks import schedule_telegram_message
 from app.api.user.utils import find_next_weekday
 from app.database.adapter import adapter
 from app.database.models import Message, User
 from app.database.session import get_async_session
 from app.dependencies.checks import check_user_token
 from app.dependencies.responses import emptyresponse
+from app.utils.schedule_task import schedule
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -35,11 +35,12 @@ async def check_notifications(
             payload["start_notification"] = False
         if msg.repeat:
             if msg.repeat_date:
-                schedule_telegram_message.apply_async(args=[user.id, msg.id], eta=msg.repeat_date)
+                await schedule(msg_id, user.id, msg.repeat_date)
                 await adapter.update_by_id(Message, msg_id, {"repeat": False}, session)
             elif msg.repeat_wd:
-                schedule_telegram_message.apply_async(
-                    args=[user.id, msg.id],
+                await schedule(
+                    msg_id,
+                    user.id,
                     eta=find_next_weekday(msg.repeat_wd) + timedelta(msg.end_send_date.time()),
                 )
         return payload

@@ -8,7 +8,8 @@ asyncpg==0.29.0
 thefuzz
 inflect
 redis
-celery
+taskiq
+taskiq-aio-pika
 passlib==1.7.4
 bcrypt==4.0.1
 python-jose==3.4.0
@@ -16,5 +17,4 @@ dotenv
 colorlog
 httpx
 httpx_aws_auth
-aio_pika
 python-multipart
