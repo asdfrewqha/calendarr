@@ -1,5 +1,4 @@
 from app.core.settings import settings
-from taskiq import TaskiqScheduler
 from taskiq_redis import (
     ListRedisScheduleSource,
     RedisAsyncResultBackend,
@@ -11,4 +10,3 @@ broker = RedisStreamBroker(url=settings.redis_settings.redis_url).with_result_ba
 )
 
 source = ListRedisScheduleSource(settings.redis_settings.redis_url, "telegram_queue")
-scheduler = TaskiqScheduler(broker, [source])
