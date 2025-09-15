@@ -10,4 +10,4 @@ RUN apt-get update && apt-get upgrade -y && \
 
 COPY . .
 
-CMD ["taskiq", "worker", "bot:broker", "--fsdp", "--no-configure-logging"]
+CMD ["taskiq", "worker", "bot:broker", "--no-configure-logging"]
