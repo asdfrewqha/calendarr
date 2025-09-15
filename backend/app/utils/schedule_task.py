@@ -10,6 +10,7 @@ async def schedule(msg_id: UUID, user_id: int, send_date: datetime):
         task_name="send_delayed_message",
         labels={"chat_id": str(user_id), "scheduled_time": send_date.isoformat()},
         args=[user_id, msg_id],
+        kwargs={},
         schedule_id=str(msg_id),
         time=send_date,
     )
