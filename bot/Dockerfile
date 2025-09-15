@@ -10,4 +10,4 @@ RUN apt-get update && apt-get upgrade -y && \
 
 COPY . .
 
-CMD ["python", "bot.py"]
+CMD ["taskiq", "worker", "bot:broker", "--fsdp", "--no-configure-logging"]
