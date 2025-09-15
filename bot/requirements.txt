@@ -1,6 +1,6 @@
 aiogram
 taskiq
-taskiq-aio-pika
+taskiq_redis
 dotenv
 aiohttp
 redis
