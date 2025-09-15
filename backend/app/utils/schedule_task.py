@@ -7,7 +7,7 @@ from taskiq import ScheduledTask
 
 async def schedule(msg_id: UUID, user_id: int, send_date: datetime):
     scheduled_task_1 = ScheduledTask(
-        schedule_id=msg_id,
+        schedule_id=str(msg_id),
         task_name="send_delayed_message",
         args=[user_id, msg_id],
         time=send_date,
