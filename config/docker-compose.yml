@@ -137,7 +137,7 @@ services:
 
   aiobot_scheduler:
     image: asdfrewqha/calendar_bot:latest
-    command: taskiq scheduler scheduler:scheduler
+    command: python scheduler.py
     container_name: taskiqscheduler-container
     env_file:
       - /root/fastapi/.env
