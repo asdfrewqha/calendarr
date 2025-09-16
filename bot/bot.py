@@ -3,9 +3,9 @@ import logging
 
 from aiogram import Bot, Dispatcher
 from aiogram.types import BotCommand
+from core.broker import broker
 from core.config import BOT_TOKEN
 from core.handlers import router
-from tasks import broker
 
 logger = logging.getLogger(__name__)
 dp = Dispatcher()
