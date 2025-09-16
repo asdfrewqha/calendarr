@@ -7,10 +7,10 @@ from utils.api_dependencies import check_notifications
 
 
 @broker.task
-async def send_delayed_message(chat_id: int, msg_id: str, bot: Bot = TaskiqDepends()):
+async def send_delayed_message(user_id: int, msg_id: str, bot: Bot = TaskiqDepends()):
     msg_id = UUID(msg_id)
 
-    payload = await check_notifications(chat_id=chat_id, msg_id=UUID(msg_id))
+    payload = await check_notifications(chat_id=user_id, msg_id=UUID(msg_id))
 
     start = payload.get("start_notification", False)
     priority = payload.get("priority", "Unknown")
@@ -35,5 +35,5 @@ async def send_delayed_message(chat_id: int, msg_id: str, bot: Bot = TaskiqDepen
     text = f"{header}Ваше напоминание.\n{priority_text}{content}{start_text}"
 
     await bot.send_message(
-        chat_id=chat_id, text=text, parse_mode="HTML", disable_web_page_preview=True
+        chat_id=user_id, text=text, parse_mode="HTML", disable_web_page_preview=True
     )
