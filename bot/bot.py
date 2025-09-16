@@ -13,10 +13,8 @@ dp = Dispatcher()
 dp.include_router(router=router)
 
 
-taskiq_aiogram.init(broker, "bot:dp", "bot:bot")
-
-
 async def on_startup(bot: Bot, *_args, **_kwargs):
+    taskiq_aiogram.init(broker, "bot:dp", "bot:bot")
     await bot.set_my_commands(
         [
             BotCommand(command="start", description="Запустить мини-приложение"),
