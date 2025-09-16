@@ -13,7 +13,7 @@ dp = Dispatcher()
 dp.include_router(router=router)
 
 
-taskiq_aiogram.init(broker, "bot:db", "bot:bot")
+taskiq_aiogram.init(broker, "bot:dp", "bot:bot")
 
 
 async def on_startup(bot: Bot, *_args, **_kwargs):
