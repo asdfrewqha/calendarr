@@ -7,6 +7,7 @@ from tasks import send_delayed_message
 
 async def main():
     await scheduler.startup()
+    await source.startup()
     async for message in redis_adapter.subscribe("telegram_queue"):
         await send_delayed_message.schedule_by_time(
             source, message["send_date"], message["user_id"], message["msg_id"]
