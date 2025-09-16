@@ -9,5 +9,3 @@ RUN apt-get update && apt-get upgrade -y && \
     pip install -r requirements.txt
 
 COPY . .
-
-CMD ["taskiq", "worker", "bot:broker", "--no-configure-logging"]

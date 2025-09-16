@@ -3,20 +3,9 @@ import logging
 
 from aiogram import Bot, Dispatcher
 from aiogram.types import BotCommand
-from core.config import BOT_TOKEN, REDIS_URL
+from core.config import BOT_TOKEN
 from core.handlers import router
-from taskiq import TaskiqScheduler
-from taskiq_redis import (
-    ListRedisScheduleSource,
-    RedisAsyncResultBackend,
-    RedisStreamBroker,
-)
-
-broker = RedisStreamBroker(url=REDIS_URL).with_result_backend(RedisAsyncResultBackend(REDIS_URL))
-
-source = ListRedisScheduleSource(REDIS_URL, "telegram_queue")
-scheduler = TaskiqScheduler(broker, [source])
-
+from tasks import broker
 
 logger = logging.getLogger(__name__)
 dp = Dispatcher()
@@ -29,14 +18,14 @@ async def on_startup(bot: Bot):
             BotCommand(command="start", description="Запустить мини-приложение"),
         ]
     )
-    await scheduler.startup()
+    await broker.startup()
     logger.info("Bot started successfully")
 
 
 async def on_shutdown(bot: Bot):
     logger.info("Shutting down bot...")
-    await scheduler.shutdown()
     await bot.session.close()
+    await broker.shutdown()
     logger.info("Bot shutdown complete")
 
 
@@ -44,7 +33,6 @@ async def main():
     bot = Bot(BOT_TOKEN)
     dp.startup.register(lambda: on_startup(bot))
     dp.shutdown.register(lambda: on_shutdown(bot))
-
     try:
         logger.info("Starting bot polling")
         await dp.start_polling(bot)

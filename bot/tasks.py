@@ -1,8 +1,15 @@
 from uuid import UUID
 
+from core.config import REDIS_URL
+from taskiq import TaskiqScheduler
+from taskiq_redis import ListQueueBroker, RedisScheduleSource
 from utils.api_dependencies import check_notifications
 
-from bot import bot, broker
+from bot import bot
+
+broker = ListQueueBroker(REDIS_URL)
+source = RedisScheduleSource(REDIS_URL)
+scheduler = TaskiqScheduler(broker, [source])
 
 
 @broker.task

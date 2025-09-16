@@ -1,4 +1,3 @@
-import asyncio
 import json
 from typing import Any, Optional
 
@@ -71,16 +70,14 @@ class AsyncRedisAdapter:
     async def subscribe(self, channel: str):
         pubsub = self.redis.pubsub()
         await pubsub.subscribe(channel)
+        logger.info("Waiting for messages...")
         try:
-            while True:
-                message = await pubsub.get_message(ignore_subscribe_messages=True, timeout=1.0)
-                if message is not None:
+            async for message in pubsub.listen():
+                if message["type"] == "message":
                     try:
                         yield json.loads(message["data"])
                     except (json.JSONDecodeError, TypeError):
-                        yield {"raw": message["data"]}
-                else:
-                    await asyncio.sleep(0.01)
+                        yield message["date"].decode("utf-8")
         finally:
             await pubsub.unsubscribe(channel)
             await pubsub.close()

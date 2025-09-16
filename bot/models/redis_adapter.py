@@ -12,6 +12,7 @@ class AsyncRedisAdapter:
     def __init__(self, decode_responses: bool = True):
         self.redis = redis.Redis.from_url(REDIS_URL, decode_responses=decode_responses)
 
+    # ----------------- обычные методы -----------------
     async def set(self, key: str, value: Any, expire: Optional[int] = None) -> bool:
         try:
             if isinstance(value, (dict, list)):
@@ -54,6 +55,32 @@ class AsyncRedisAdapter:
             logger.exception(f"Redis EXPIRE error: {e}")
             return False
 
+    # ----------------- методы pub/sub -----------------
+    async def publish(self, channel: str, message: dict) -> bool:
+        try:
+            payload = json.dumps(message)
+            await self.redis.publish(channel, payload)
+            return True
+        except Exception as e:
+            logger.exception(f"Redis PUBLISH error: {e}")
+            return False
+
+    async def subscribe(self, channel: str):
+        pubsub = self.redis.pubsub()
+        await pubsub.subscribe(channel)
+        logger.info("Waiting for messages...")
+        try:
+            async for message in pubsub.listen():
+                if message["type"] == "message":
+                    try:
+                        yield json.loads(message["data"])
+                    except (json.JSONDecodeError, TypeError):
+                        yield message["date"].decode("utf-8")
+        finally:
+            await pubsub.unsubscribe(channel)
+            await pubsub.close()
+
+    # ----------------- закрытие соединения -----------------
     async def close(self):
         await self.redis.close()
 
