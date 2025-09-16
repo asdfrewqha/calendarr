@@ -122,7 +122,7 @@ services:
 
   aiobot:
     image: asdfrewqha/calendar_bot:latest
-    command: taskiq broker bot:broker
+    command: taskiq worker bot:broker
     container_name: aiobot-container
     env_file:
       - /root/fastapi/.env
