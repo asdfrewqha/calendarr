@@ -37,7 +37,11 @@ async def check_notifications(
             if msg.repeat_date:
                 await redis_adapter.publish(
                     "telegram_queue",
-                    {"msg_id": str(msg_id), "user_id": user.id, "send_date": msg.repeat_date},
+                    {
+                        "msg_id": str(msg_id),
+                        "user_id": user.id,
+                        "send_date": msg.repeat_date.isoformat(),
+                    },
                 )
                 await adapter.update_by_id(Message, msg_id, {"repeat": False}, session)
             elif msg.repeat_wd:
@@ -46,8 +50,9 @@ async def check_notifications(
                     {
                         "msg_id": str(msg_id),
                         "user_id": user.id,
-                        "send_date": find_next_weekday(msg.repeat_wd)
-                        + timedelta(msg.end_send_date.time()),
+                        "send_date": (
+                            find_next_weekday(msg.repeat_wd) + timedelta(msg.end_send_date.time())
+                        ).isoformat(),
                     },
                 )
         return payload
