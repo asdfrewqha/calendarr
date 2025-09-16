@@ -1,6 +1,7 @@
 import asyncio
 import logging
 
+import taskiq_aiogram
 from aiogram import Bot, Dispatcher
 from aiogram.types import BotCommand
 from core.broker import broker
@@ -12,20 +13,27 @@ dp = Dispatcher()
 dp.include_router(router=router)
 
 
-async def on_startup(bot: Bot):
+taskiq_aiogram.init(broker, "bot:db", "bot:bot")
+
+
+async def on_startup(bot: Bot, *_args, **_kwargs):
     await bot.set_my_commands(
         [
             BotCommand(command="start", description="Запустить мини-приложение"),
         ]
     )
-    await broker.startup()
+    if not broker.is_worker_process:
+        logger.info("Setting up taskiq")
+        await broker.startup()
     logger.info("Bot started successfully")
 
 
-async def on_shutdown(bot: Bot):
+async def on_shutdown(bot: Bot, *_args, **_kwargs):
     logger.info("Shutting down bot...")
     await bot.session.close()
-    await broker.shutdown()
+    if not broker.is_worker_process:
+        logging.info("Shutting down taskiq")
+        await broker.shutdown()
     logger.info("Bot shutdown complete")
 
 

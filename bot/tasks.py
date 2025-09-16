@@ -1,13 +1,13 @@
 from uuid import UUID
 
+from aiogram import Bot
 from core.broker import broker
+from taskiq import TaskiqDepends
 from utils.api_dependencies import check_notifications
-
-from bot import bot
 
 
 @broker.task
-async def send_delayed_message(chat_id: int, msg_id: str):
+async def send_delayed_message(chat_id: int, msg_id: str, bot: Bot = TaskiqDepends()):
     msg_id = UUID(msg_id)
 
     payload = await check_notifications(chat_id=chat_id, msg_id=UUID(msg_id))
