@@ -1,7 +1,8 @@
 import asyncio
 
+from core.broker import scheduler, source
 from models.redis_adapter import redis_adapter
-from tasks import scheduler, send_delayed_message, source
+from tasks import send_delayed_message
 
 
 async def main():
