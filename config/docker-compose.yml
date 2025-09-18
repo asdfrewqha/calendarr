@@ -122,7 +122,7 @@ services:
 
   aiobot:
     image: asdfrewqha/calendar_bot:latest
-    command: taskiq worker bot:broker
+    command: python bot.py
     container_name: aiobot-container
     env_file:
       - /root/fastapi/.env
@@ -138,7 +138,7 @@ services:
   aiobot_scheduler:
     image: asdfrewqha/calendar_bot:latest
     command: python scheduler.py
-    container_name: taskiqscheduler-container
+    container_name: scheduler-container
     env_file:
       - /root/fastapi/.env
     depends_on:
@@ -146,6 +146,32 @@ services:
         condition: service_healthy
     #   rabbitmq:
     #     condition: service_healthy
+    networks:
+      - backend_net
+    restart: always
+
+  taskiq_worker:
+    image: asdfrewqha/calendar_bot:latest
+    command: taskiq worker core.broker:broker tasks
+    container_name: taskiqworkers-container
+    env_file:
+      - /root/fastapi/.env
+    depends_on:
+      redis:
+        condition: service_healthy
+    networks:
+      - backend_net
+    restart: always
+
+  taskiq_scheduler:
+    image: asdfrewqha/calendar_bot:latest
+    command: taskiq scheduler core.broker:scheduler
+    container_name: taskiqscheduler-container
+    env_file:
+      - /root/fastapi/.env
+    depends_on:
+      redis:
+        condition: service_healthy
     networks:
       - backend_net
     restart: always
