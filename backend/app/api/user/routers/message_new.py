@@ -1,6 +1,8 @@
 from typing import Annotated
 
 from app.api.user.schemas import CreatedMessageResponse, MessageCreateScheme
+from app.core.broker import source
+from app.core.tasks import send_telegram
 from app.database.adapter import adapter
 from app.database.models import Message, User
 from app.database.session import get_async_session
@@ -19,23 +21,15 @@ async def create_message(
     session: Annotated[AsyncSession, Depends(get_async_session)],
 ):
     msg.user_id = user.id
-    if msg.start_send_date:
-        msg.send_start = True
     msg_dict = MessageCreateScheme.model_dump(msg, exclude_none=True, exclude_unset=True)
     new_msg = await adapter.insert(Message, msg_dict, session)
-    await redis_adapter.publish(
-        "telegram_queue",
-        {"msg_id": str(new_msg.id), "user_id": user.id, "send_date": msg.end_send_date.isoformat()},
-    )
+    await send_telegram.schedule_by_time(source, msg.end_send_date, new_msg.id, user.id, session)
     if msg.start_send_date:
-        await redis_adapter.publish(
-            "telegram_queue",
-            {
-                "msg_id": str(new_msg.id),
-                "user_id": user.id,
-                "send_date": msg.start_send_date.isoformat(),
-            },
+        await send_telegram.schedule_by_time(
+            source, msg.start_send_date, new_msg.id, user.id, session
         )
+    if msg.repeat:
+        pass
     msg_obj = MessageCreateScheme.model_validate(new_msg, from_attributes=True)
     msg_obj.event = "message_created"
     msg_json = MessageCreateScheme.model_dump_json(msg_obj)

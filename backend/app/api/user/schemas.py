@@ -1,8 +1,8 @@
-from datetime import datetime
+from datetime import date, time
 from typing import Optional
 from uuid import UUID
 
-from app.database.utils import MessageType
+from app.database.utils import MsgType
 from pydantic import BaseModel, ConfigDict
 
 
@@ -21,14 +21,14 @@ class MessageCreateScheme(BaseModel):
     user_id: Optional[int] = None
     name: Optional[str] = None
     payload: Optional[dict] = None
-    start_send_date: Optional[datetime] = None
-    send_start: bool = False
-    end_send_date: datetime
-    type: MessageType
+    start_send_date: date
+    type: MsgType
+    start_send_time: Optional[time] = None
+    end_send_date: Optional[date] = None
+    end_send_time: Optional[time] = None
+    priority: int
     notification: bool = True
-    priority: int = 5
     repeat: bool = False
-    repeat_date: Optional[datetime] = None
     repeat_wd: Optional[list] = None
 
 
@@ -41,14 +41,14 @@ class MessageScheme(BaseModel):
     user_id: Optional[int] = None
     name: Optional[str] = None
     payload: Optional[dict] = None
-    start_send_date: Optional[datetime] = None
-    end_send_date: datetime
-    is_active: bool = True
-    type: MessageType
-    notification: bool
+    start_send_date: date
+    type: MsgType
+    start_send_time: Optional[time] = None
+    end_send_date: Optional[date] = None
+    end_send_time: Optional[time] = None
     priority: int
+    notification: bool = True
     repeat: bool = False
-    repeat_date: Optional[datetime] = None
     repeat_wd: Optional[list] = None
 
 
@@ -57,11 +57,12 @@ class MessageUpdateScheme(BaseModel):
     id: Optional[UUID] = None
     name: Optional[str] = None
     payload: Optional[dict] = None
-    start_send_date: Optional[datetime] = None
-    end_send_date: Optional[datetime] = None
-    type: Optional[MessageType] = None
-    notification: Optional[bool] = None
-    priority: Optional[int] = None
+    start_send_date: date
+    type: MsgType
+    start_send_time: Optional[time] = None
+    end_send_date: Optional[date] = None
+    end_send_time: Optional[time] = None
+    priority: int
+    notification: bool = True
     repeat: bool = False
-    repeat_date: Optional[datetime] = None
     repeat_wd: Optional[list] = None

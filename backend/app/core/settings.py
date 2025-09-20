@@ -37,20 +37,10 @@ class RedisSettings(BaseSettings):
         return f"redis://:{self.redis_pass.get_secret_value()}@{self.redis_host}:{self.redis_port}/{self.redis_db}"
 
 
-class RabbitMQSettings(BaseSettings):
-    rabbitmq_user: str
-    rabbitmq_password: SecretStr
-
-    @property
-    def celery_url(self):
-        return f"amqp://{self.rabbitmq_user}:{self.rabbitmq_password.get_secret_value()}@rabbitmq:5672/"
-
-
 class Settings(BaseSettings):
     db_settings: DBSettings = DBSettings()
     jwt_settings: JWTSettings = JWTSettings()
     redis_settings: RedisSettings = RedisSettings()
-    rbmq: RabbitMQSettings = RabbitMQSettings()
 
     frontend_url: str
     bot_token: SecretStr
