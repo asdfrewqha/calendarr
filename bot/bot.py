@@ -3,10 +3,9 @@ import logging
 
 from aiogram import Bot, Dispatcher
 from aiogram.types import BotCommand
-
-from bot.core.config import BOT_TOKEN
-from bot.core.handlers import router
-from bot.models.redis_adapter import redis_adapter
+from core.config import BOT_TOKEN
+from core.handlers import router
+from models.redis_adapter import redis_adapter
 
 logger = logging.getLogger(__name__)
 dp = Dispatcher()
