@@ -3,7 +3,6 @@ import json
 import time
 from hashlib import sha256
 from urllib.parse import urlencode
-from uuid import UUID
 
 import aiohttp
 from core.config import BACKEND_URL, BOT_TOKEN
@@ -57,15 +56,3 @@ async def get_access_cookies(chat_id: int, chat_username: str = None):
                     cookies[cookie_name] = cookie_value.value
                     await redis_adapter.set(f"{cookie_name}:{chat_id}", cookie_value.value)
                 return cookies
-
-
-async def check_notifications(chat_id: int, msg_id: UUID):
-    cookies = await get_access_cookies(chat_id=chat_id)
-    async with aiohttp.ClientSession(cookies=cookies) as session:
-        async with session.get(f"{BACKEND_URL}/message/notification/{msg_id}") as resp:
-            if resp.status == 200:
-                return await resp.json()
-            elif resp.status == 204:
-                return None
-            else:
-                raise Exception(f"Check notifications failed: {resp.status}")
