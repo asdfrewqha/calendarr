@@ -1,3 +1,4 @@
+from datetime import datetime, timezone
 from typing import Annotated
 
 from app.api.user.schemas import CreatedMessageResponse, MessageCreateScheme
@@ -23,7 +24,7 @@ async def create_message(
     msg.user_id = user.id
     msg_dict = MessageCreateScheme.model_dump(msg, exclude_none=True, exclude_unset=True)
     new_msg = await adapter.insert(Message, msg_dict, session)
-    start_send_datetime = msg.start_send_date + msg.start_send_time
+    start_send_datetime = datetime.combine(msg.start_send_date, msg.start_send_time, timezone.utc)
     await send_telegram.schedule_by_time(source, start_send_datetime, new_msg.id, user.id)
     if msg.start_send_date:
         await send_telegram.schedule_by_time(source, msg.start_send_date, new_msg.id, user.id)
