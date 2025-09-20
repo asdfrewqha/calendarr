@@ -39,5 +39,7 @@ class Message(IDMixin, TimestampsMixin, Base):
     end_send_time: Mapped[time] = mapped_column(Time(timezone=True), nullable=True)
     priority: Mapped[int] = mapped_column(Integer)
     notification: Mapped[bool] = mapped_column(Boolean, default=True)
+    send_start: Mapped[bool] = mapped_column(Boolean, default=True)
+    send_end: Mapped[bool] = mapped_column(Boolean, default=False)
     repeat: Mapped[bool] = mapped_column(Boolean)
     repeat_wd: Mapped[Optional[List[int]]] = mapped_column(ARRAY(Integer), nullable=True)
