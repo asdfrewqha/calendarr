@@ -2,6 +2,7 @@ from typing import Annotated
 from uuid import UUID
 
 from app.core.broker import broker
+from app.core.logging import get_logger
 from app.database.adapter import adapter
 from app.database.models import Message
 from app.database.session import get_async_session
@@ -14,6 +15,7 @@ from taskiq import TaskiqDepends
 async def send_telegram(
     msg_id: UUID, user_id: int, session: Annotated[AsyncSession, TaskiqDepends(get_async_session)]
 ):
+    logger = get_logger()
     msg = await adapter.get_by_id(Message, msg_id, session)
     # if msg.send_start:
     #     start = True
@@ -37,4 +39,5 @@ async def send_telegram(
         "text": text,
         "user_id": user_id,
     }
+    logger.info(text)
     await redis_adapter.publish("telegram_queue", payld)
