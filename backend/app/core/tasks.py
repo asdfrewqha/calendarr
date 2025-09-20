@@ -15,12 +15,12 @@ async def send_telegram(
     msg_id: UUID, user_id: int, session: Annotated[AsyncSession, TaskiqDepends(get_async_session)]
 ):
     msg = await adapter.get_by_id(Message, msg_id, session)
-    if msg.send_start:
-        start = True
-        await adapter.update_by_id(Message, msg_id, {"send_start": False}, session)
+    # if msg.send_start:
+    #     start = True
+    #     await adapter.update_by_id(Message, msg_id, {"send_start": False}, session)
     header = f"<b>{msg.name}</b>\n" if msg.name else ""
     priority_text = f"Приоритет: {msg.priority}\n"
-    start_text = "Это первое напоминание.\n" if start else ""
+    start_text = "Это первое напоминание.\n"  # if start else ""
     if msg.payload.get("description"):
         content = f"Сообщение:\n{msg.payload['description']}\n"
     else:
