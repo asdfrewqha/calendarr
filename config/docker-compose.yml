@@ -100,7 +100,7 @@ services:
 
   taskiq:
     image: asdfrewqha/calendar:latest
-    command: taskiq worker -w 1 app.core.broker:broker app.core.tasks
+    command: taskiq worker app.core.broker:broker app.core.tasks
     container_name: taskiq-container
     env_file:
       - /root/fastapi/.env

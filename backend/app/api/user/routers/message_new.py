@@ -26,8 +26,11 @@ async def create_message(
     new_msg = await adapter.insert(Message, msg_dict, session)
     start_send_datetime = datetime.combine(msg.start_send_date, msg.start_send_time, timezone.utc)
     await send_telegram.schedule_by_time(source, start_send_datetime, new_msg.id, user.id)
-    if msg.start_send_date:
-        await send_telegram.schedule_by_time(source, msg.start_send_date, new_msg.id, user.id)
+    if msg.end_send_date:
+        end_send_datetime = msg.end_send_date
+        if msg.end_send_time:
+            end_send_datetime = datetime.combine(msg.end_send_date, msg.end_send_time, timezone.utc)
+        await send_telegram.schedule_by_time(source, end_send_datetime, new_msg.id, user.id)
     if msg.repeat:
         pass
     msg_obj = MessageCreateScheme.model_validate(new_msg, from_attributes=True)
