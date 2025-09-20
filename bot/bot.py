@@ -22,9 +22,9 @@ async def main():
     )
     try:
         logger.info("Starting bot polling")
-        await dp.start_polling(bot)
         async for x in redis_adapter.subscribe("telegram_queue"):
             await bot.send_message(x.get("user_id"), x.get("text"))
+        await dp.start_polling(bot)
     except (KeyboardInterrupt, SystemExit):
         logger.info("Bot stopped by user")
 
