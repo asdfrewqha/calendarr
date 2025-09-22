@@ -1,3 +1,4 @@
+import json
 from typing import Annotated
 from uuid import UUID
 
@@ -23,6 +24,7 @@ async def send_telegram(
         msg = await session.execute(select(Message).where(Message.id == msg_id))
         msg = msg.scalar_one_or_none()
         if msg:
+            logger.warning("sending msg")
             if msg.send_start:
                 start = True
                 await session.execute(
@@ -49,4 +51,4 @@ async def send_telegram(
             }
             logger.info(text)
             async with redis.get_client() as client:
-                await client.publish("telegram_queue", payld)
+                await client.publish("telegram_queue", json.dumps(payld))

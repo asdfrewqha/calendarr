@@ -28,8 +28,8 @@ class MessageCreateScheme(BaseModel):
     end_send_time: Optional[time] = None
     send_start: bool = True
     send_end: Optional[bool] = None
-    start_schedule_id: Optional[UUID] = None
-    end_schedule_id: Optional[UUID] = None
+    start_schedule_id: Optional[str] = None
+    end_schedule_id: Optional[str] = None
     priority: int
     notification: bool = True
     repeat: Optional[bool] = None
@@ -71,8 +71,8 @@ class MessageUpdateScheme(BaseModel):
     end_send_time: Optional[time] = None
     send_start: bool = True
     send_end: Optional[bool] = None
-    start_schedule_id: Optional[UUID] = None
-    end_schedule_id: Optional[UUID] = None
+    start_schedule_id: Optional[str] = None
+    end_schedule_id: Optional[str] = None
     priority: Optional[int] = None
     notification: bool = True
     repeat: bool = False
