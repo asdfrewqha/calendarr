@@ -60,18 +60,15 @@ class MessageService:
                 if message.repeat:
                     pass
                 message_dict = message.model_dump(exclude_none=True, exclude_unset=True)
+                message.event = "message_created"
+                msg_json = message.model_dump_json(exclude_none=True, exclude_unset=True)
                 record = self.message(**message_dict)
                 session.add(record)
                 await session.commit()
                 await session.refresh(record)
-                msg_obj = MessageCreateScheme.model_validate(record)
-                msg_obj.event = "message_created"
-                msg_json = MessageCreateScheme.model_dump_json(
-                    msg_obj, exclude_none=True, exclude_unset=True
-                )
                 async with self.redis.get_client() as client:
                     await client.publish(f"messages:{user_id}", msg_json)
-                return CreatedMessageResponse(id=record.id)
+                return CreatedMessageResponse(id=new_msg_id)
             raise HTTPException(404, "User not found")
 
     async def list_messages(self, user_id: int, start_date: date, end_date: Optional[date] = None):

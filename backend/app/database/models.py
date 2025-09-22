@@ -55,5 +55,5 @@ class Message(IDMixin, TimestampsMixin, Base):
     start_schedule_id: Mapped[UUID] = mapped_column(Uuid(as_uuid=True))
     end_schedule_id: Mapped[UUID] = mapped_column(Uuid(as_uuid=True), nullable=True)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
-    repeat: Mapped[bool] = mapped_column(Boolean)
+    repeat: Mapped[bool] = mapped_column(Boolean, default=False)
     repeat_wd: Mapped[Optional[List[int]]] = mapped_column(ARRAY(Integer), nullable=True)

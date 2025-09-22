@@ -32,7 +32,7 @@ class MessageCreateScheme(BaseModel):
     end_schedule_id: Optional[UUID] = None
     priority: int
     notification: bool = True
-    repeat: bool = False
+    repeat: Optional[bool] = None
     repeat_wd: Optional[list] = None
 
 
