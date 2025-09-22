@@ -5,7 +5,7 @@ from app.core.logging.logging import setup_logging
 from app.core.routers_loader import include_all_routers
 from app.core.settings import settings
 from app.core.taskiq.broker import broker
-from app.database.adapter import adapter
+from app.dependencies.db_dependency import DBDependency
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import RedirectResponse
@@ -13,7 +13,7 @@ from fastapi.responses import RedirectResponse
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    await adapter.initialize_tables()
+    await DBDependency.initialize_tables()
     if not broker.is_worker_process:
         await broker.startup()
     yield
