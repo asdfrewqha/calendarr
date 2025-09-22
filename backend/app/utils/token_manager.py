@@ -1,11 +1,10 @@
 from datetime import datetime, timedelta, timezone
 from typing import Any, Dict
 
+from app.core.logging.logging import get_logger
 from app.core.settings import settings
 from fastapi.exceptions import HTTPException
 from jose import JWTError, jwt
-
-from backend.app.core.logging.logging import get_logger
 
 logger = get_logger()
 

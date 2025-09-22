@@ -1,4 +1,3 @@
-# main.py
 from contextlib import asynccontextmanager
 
 from app.core.logging.log_middleware import LoggingMiddleware
