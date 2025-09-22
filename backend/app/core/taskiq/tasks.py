@@ -26,6 +26,7 @@ async def send_telegram(
         msg = msg.scalar_one_or_none()
         logger.info(msg.id)
         if msg:
+            start = False
             logger.warning("sending msg")
             if msg.send_start:
                 start = True
