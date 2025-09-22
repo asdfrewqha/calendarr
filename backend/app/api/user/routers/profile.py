@@ -13,4 +13,4 @@ async def profile(
     user_id: Annotated[int, Depends(check_user_token)],
     service: Annotated[MessageService, Depends(MessageService)],
 ):
-    return service.profile(user_id)
+    return await service.profile(user_id)
