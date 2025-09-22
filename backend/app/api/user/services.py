@@ -41,9 +41,9 @@ class MessageService:
                 start_send_datetime = datetime.combine(
                     message.start_send_date, message.start_send_time, timezone.utc
                 )
-                new_msg_id = uuid4()
+                message.id = uuid4()
                 schedule1 = await send_telegram.schedule_by_time(
-                    source, start_send_datetime, new_msg_id, user_id
+                    source, start_send_datetime, message.id, user_id
                 )
                 message.start_schedule_id = schedule1.schedule_id
                 if message.end_send_date:
@@ -53,7 +53,7 @@ class MessageService:
                             message.end_send_date, message.end_send_time, timezone.utc
                         )
                     schedule2 = await send_telegram.schedule_by_time(
-                        source, end_send_datetime, new_msg_id, user_id
+                        source, end_send_datetime, message.id, user_id
                     )
                     message.end_schedule_id = schedule2.schedule_id
                     message.send_end = True
@@ -68,7 +68,7 @@ class MessageService:
                 await session.refresh(record)
                 async with self.redis.get_client() as client:
                     await client.publish(f"messages:{user_id}", msg_json)
-                return CreatedMessageResponse(id=new_msg_id)
+                return CreatedMessageResponse(id=message.id)
             raise HTTPException(404, "User not found")
 
     async def list_messages(self, user_id: int, start_date: date, end_date: Optional[date] = None):
