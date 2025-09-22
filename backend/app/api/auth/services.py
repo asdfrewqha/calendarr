@@ -16,14 +16,14 @@ from sqlalchemy.future import select
 
 
 class UserService:
+    model: Annotated[type[User], User]
+
     def __init__(
         self,
-        model: Annotated[type[User], User],
         db: Annotated[DBDependency, Depends(DBDependency)],
         redis: Annotated[RedisDependency, Depends(RedisDependency)],
     ) -> None:
         self.db = db
-        self.model = model
         self.redis = redis
 
     async def register(self, user: UserCreate):

@@ -22,15 +22,14 @@ from sqlalchemy.future import select
 
 
 class MessageService:
+    user_model: Annotated[type[User], User]
+    message_model: Annotated[type[Message], Message]
+
     def __init__(
         self,
-        user_model: Annotated[type[User], User],
-        message_model: Annotated[type[Message], Message],
         db: Annotated[DBDependency, Depends(DBDependency)],
         redis: Annotated[RedisDependency, Depends(RedisDependency)],
     ):
-        self.user = user_model
-        self.message = message_model
         self.db = db
         self.redis = redis
 
