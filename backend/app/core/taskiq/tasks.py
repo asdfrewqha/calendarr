@@ -34,7 +34,6 @@ async def send_telegram(
                     update(Message).where(Message.id == msg_id).values(send_start=False)
                 )
                 await session.commit()
-                await session.refresh()
             header = f"<b>{msg.name}</b>\n" if msg.name else ""
             priority_text = f"Приоритет: {msg.priority}\n"
             start_text = "Это первое напоминание.\n" if start else ""
