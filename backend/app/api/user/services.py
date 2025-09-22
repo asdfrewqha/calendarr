@@ -22,8 +22,8 @@ from sqlalchemy.future import select
 
 
 class MessageService:
-    user: User
-    message: Message
+    user = User
+    message = Message
 
     def __init__(
         self,

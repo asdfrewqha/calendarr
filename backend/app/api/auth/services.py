@@ -16,7 +16,7 @@ from sqlalchemy.future import select
 
 
 class UserService:
-    model: User
+    model = User
 
     def __init__(
         self,
