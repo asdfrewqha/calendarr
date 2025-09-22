@@ -16,7 +16,7 @@ async def check_user_token(
     redis: Annotated[RedisDependency, Depends(RedisDependency)],
 ) -> int:
     async with redis.get_client() as client:
-        user_id = client.get(f"access_token:{tokens.access_token}")
+        user_id = await client.get(f"access_token:{tokens.access_token}")
     if not user_id:
         data = TokenManager.decode_token(tokens.access_token)
         user_id = data.get("sub")
