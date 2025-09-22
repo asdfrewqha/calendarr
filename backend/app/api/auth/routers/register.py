@@ -8,5 +8,11 @@ router = APIRouter()
 
 
 @router.post("/register")
-async def register_user(user: UserCreate, service: Annotated[UserService, Depends(UserService)]):
+async def register_user(
+    service: Annotated[UserService, Depends(UserService)],
+    id: int,
+    name: str = None,
+    username: str = None,
+):
+    user = UserCreate(id=id, name=name, username=username)
     return await service.register(user=user)
