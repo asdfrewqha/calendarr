@@ -17,7 +17,7 @@ async def handle_start(message: Message):
     async with ClientSession() as session:
         await session.post(
             url=f"{BACKEND_URL}/register",
-            params={
+            body={
                 "id": message.chat.id,
                 "name": message.chat.first_name,
                 "username": message.chat.username,
