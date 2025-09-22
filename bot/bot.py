@@ -1,4 +1,5 @@
 import asyncio
+import json
 import logging
 
 from aiogram import Bot, Dispatcher
@@ -23,10 +24,12 @@ async def redis_subscriber():
     async for message in pubsub.listen():
         if message["type"] != "message":
             continue
-        data = message["data"]
+        data = json.loads(message["data"])
         logger.info(f"Received pubsub message: {data}")
         try:
-            await bot.send_message(chat_id=data["user_id"], text=data["text"], parse_mode="HTML")
+            await bot.send_message(
+                chat_id=int(data["user_id"]), text=data["text"], parse_mode="HTML"
+            )
         except Exception as e:
             logger.error(f"Error while sending message: {e}")
 
@@ -34,7 +37,7 @@ async def redis_subscriber():
 async def main():
     await bot.set_my_commands(
         [
-            BotCommand(command="start", description="Отправить через минуту"),
+            BotCommand(command="start", description="Запустить бота"),
         ]
     )
 

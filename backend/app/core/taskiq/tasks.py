@@ -51,6 +51,5 @@ async def send_telegram(
                 "text": text,
                 "user_id": user_id,
             }
-            logger.info(text)
             async with redis.get_client() as client:
                 await client.publish("telegram_queue", json.dumps(payld))
