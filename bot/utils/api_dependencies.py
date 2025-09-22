@@ -5,10 +5,10 @@ from hashlib import sha256
 from urllib.parse import urlencode
 
 import aiohttp
+from core.config import BACKEND_URL, BOT_TOKEN
 from redis import Redis
 
 from bot import redis
-from bot.core.config import BACKEND_URL, BOT_TOKEN
 
 
 def create_init_data(user_id: int, username: str = None) -> str:
