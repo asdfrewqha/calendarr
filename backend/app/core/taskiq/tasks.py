@@ -11,6 +11,8 @@ from sqlalchemy import update
 from sqlalchemy.future import select
 from taskiq import TaskiqDepends
 
+logger = get_logger()
+
 
 @broker.task
 async def send_telegram(
@@ -20,9 +22,9 @@ async def send_telegram(
     redis: Annotated[RedisDependency, TaskiqDepends(RedisDependency)],
 ):
     async with db.db_session() as session:
-        logger = get_logger()
         msg = await session.execute(select(Message).where(Message.id == msg_id))
         msg = msg.scalar_one_or_none()
+        logger.info(msg.id)
         if msg:
             logger.warning("sending msg")
             if msg.send_start:
