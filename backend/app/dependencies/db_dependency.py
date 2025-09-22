@@ -19,9 +19,13 @@ class DBDependency:
     def db_session(self) -> async_sessionmaker[AsyncSession]:
         return self._session_factory
 
-    @staticmethod
-    async def initialize_tables(self) -> None:
+    @classmethod
+    async def initialize_tables(cls) -> None:
         logger.info(settings.db_settings.db_url)
         logger.info("Tables are created or exists")
-        async with self.engine.begin() as conn:
+        engine = create_async_engine(
+            url=settings.db_settings.db_url, echo=settings.db_settings.db_echo
+        )
+        async with engine.begin() as conn:
             await conn.run_sync(Base.metadata.create_all)
+        await engine.dispose()
