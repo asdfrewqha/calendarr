@@ -29,6 +29,7 @@ async def send_telegram(
             logger.warning("sending msg")
             if msg.send_start:
                 start = True
+                logger.info("start_message")
                 await session.execute(
                     update(Message).where(Message.id == msg_id).values(send_start=False)
                 )
