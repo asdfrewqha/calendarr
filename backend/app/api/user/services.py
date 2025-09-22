@@ -22,8 +22,8 @@ from sqlalchemy.future import select
 
 
 class MessageService:
-    user_model: Annotated[type[User], User]
-    message_model: Annotated[type[Message], Message]
+    user: User
+    message: Message
 
     def __init__(
         self,
@@ -62,7 +62,7 @@ class MessageService:
                 message_dict = message.model_dump(exclude_none=True, exclude_unset=True)
                 record = self.message(**message_dict)
                 session.add(record)
-                await session.commit
+                await session.commit()
                 await session.refresh(record)
                 msg_obj = MessageCreateScheme.model_validate(record)
                 msg_obj.event = "message_created"
@@ -156,7 +156,9 @@ class MessageService:
         async with self.db.db_session() as session:
             user = await session.execute(select(self.user).where(self.user.id == user_id))
             if user.scalar_one_or_none():
-                message = await session.execute(select(self.message).where(self.message == msg_id))
+                message = await session.execute(
+                    select(self.message).where(self.message.id == msg_id)
+                )
                 message = message.scalar_one_or_none()
                 if message:
                     if message.user_id == user_id:
@@ -219,11 +221,11 @@ class MessageService:
 
     async def set_user_notifications(self, user_id: int):
         async with self.db.db_session() as session:
-            user = await session.execute(select(self.user).where(self.user == user_id))
+            user = await session.execute(select(self.user).where(self.user.id == user_id))
             user = user.scalar_one_or_none()
             await session.execute(
-                update(self.message)
-                .where(self.message.id == user_id)
+                update(self.user)
+                .where(self.user.id == user_id)
                 .values(notifications_bool=not user.notifications_bool)
             )
             await session.commit()

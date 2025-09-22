@@ -16,7 +16,7 @@ from sqlalchemy.future import select
 
 
 class UserService:
-    model: Annotated[type[User], User]
+    model: User
 
     def __init__(
         self,
