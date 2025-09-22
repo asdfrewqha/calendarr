@@ -17,6 +17,7 @@ redis = Redis.from_url(REDIS_URL, decode_responses=True)
 
 async def redis_subscriber():
     pubsub = redis.pubsub()
+    logger.info("Waiting for redis messages")
     await pubsub.subscribe("telegram_queue")
 
     async for message in pubsub.listen():
