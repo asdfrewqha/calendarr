@@ -5,8 +5,10 @@ from hashlib import sha256
 from urllib.parse import urlencode
 
 import aiohttp
-from core.config import BACKEND_URL, BOT_TOKEN
-from models.redis_adapter import redis_adapter
+from redis import Redis
+
+from bot import redis
+from bot.core.config import BACKEND_URL, BOT_TOKEN
 
 
 def create_init_data(user_id: int, username: str = None) -> str:
@@ -27,9 +29,11 @@ def create_init_data(user_id: int, username: str = None) -> str:
     return urlencode(init_data)
 
 
-async def get_access_cookies(chat_id: int, chat_username: str = None):
-    access = await redis_adapter.get(f"access_token:{chat_id}")
-    refresh = await redis_adapter.get(f"refresh_token:{chat_id}")
+async def get_access_cookies(chat_id: int, chat_username: str = None, redis: Redis = redis):
+    access = await redis.get(f"access_token:{chat_id}")
+    refresh = await redis.get(f"refresh_token:{chat_id}")
+    access = json.loads(access)
+    refresh = json.loads(refresh)
     if access:
         return {"access_token": access, "refresh_token": refresh}
     elif refresh:
@@ -54,5 +58,5 @@ async def get_access_cookies(chat_id: int, chat_username: str = None):
                 cookies = {}
                 for cookie_name, cookie_value in response.cookies.items():
                     cookies[cookie_name] = cookie_value.value
-                    await redis_adapter.set(f"{cookie_name}:{chat_id}", cookie_value.value)
+                    await redis.set(f"{cookie_name}:{chat_id}", json.dumps(cookie_value.value))
                 return cookies
