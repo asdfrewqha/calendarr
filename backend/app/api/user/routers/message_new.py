@@ -1,16 +1,9 @@
-from datetime import datetime, timezone
 from typing import Annotated
 
 from app.api.user.schemas import CreatedMessageResponse, MessageCreateScheme
-from app.core.broker import source
-from app.core.tasks import send_telegram
-from app.database.adapter import adapter
-from app.database.models import Message, User
-from app.database.session import get_async_session
+from app.api.user.services import MessageService
 from app.dependencies.checks import check_user_token
-from app.utils.redis_adapter import redis_adapter
 from fastapi import APIRouter, Depends
-from sqlalchemy.ext.asyncio import AsyncSession
 
 router = APIRouter()
 
@@ -18,23 +11,7 @@ router = APIRouter()
 @router.post("/message", response_model=CreatedMessageResponse)
 async def create_message(
     msg: MessageCreateScheme,
-    user: Annotated[User, Depends(check_user_token)],
-    session: Annotated[AsyncSession, Depends(get_async_session)],
+    user_id: Annotated[int, Depends(check_user_token)],
+    service: Annotated[MessageService, Depends(MessageService)],
 ):
-    msg.user_id = user.id
-    msg_dict = MessageCreateScheme.model_dump(msg, exclude_none=True, exclude_unset=True)
-    new_msg = await adapter.insert(Message, msg_dict, session)
-    start_send_datetime = datetime.combine(msg.start_send_date, msg.start_send_time, timezone.utc)
-    await send_telegram.schedule_by_time(source, start_send_datetime, new_msg.id, user.id)
-    if msg.end_send_date:
-        end_send_datetime = msg.end_send_date
-        if msg.end_send_time:
-            end_send_datetime = datetime.combine(msg.end_send_date, msg.end_send_time, timezone.utc)
-        await send_telegram.schedule_by_time(source, end_send_datetime, new_msg.id, user.id)
-    if msg.repeat:
-        pass
-    msg_obj = MessageCreateScheme.model_validate(new_msg, from_attributes=True)
-    msg_obj.event = "message_created"
-    msg_json = MessageCreateScheme.model_dump_json(msg_obj)
-    await redis_adapter.publish(f"messages:{user.id}", msg_json)
-    return CreatedMessageResponse(id=new_msg.id)
+    return await service.create_message(msg, user_id)

@@ -1,11 +1,22 @@
 from datetime import date, time
 from typing import List, Optional
+from uuid import UUID
 
 import inflect
 from app.database.mixins.id_mixins import IDMixin
 from app.database.mixins.timestamp_mixins import TimestampsMixin
 from app.database.utils import MsgType
-from sqlalchemy import ARRAY, BigInteger, Boolean, Date, Enum, Integer, String, Time
+from sqlalchemy import (
+    ARRAY,
+    BigInteger,
+    Boolean,
+    Date,
+    Enum,
+    Integer,
+    String,
+    Time,
+    Uuid,
+)
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, declarative_base, declared_attr, mapped_column
 
@@ -41,5 +52,8 @@ class Message(IDMixin, TimestampsMixin, Base):
     notification: Mapped[bool] = mapped_column(Boolean, default=True)
     send_start: Mapped[bool] = mapped_column(Boolean, default=True)
     send_end: Mapped[bool] = mapped_column(Boolean, default=False)
+    start_schedule_id: Mapped[UUID] = mapped_column(Uuid(as_uuid=True))
+    end_schedule_id: Mapped[UUID] = mapped_column(Uuid(as_uuid=True), nullable=True)
+    is_active: Mapped[bool] = mapped_column(Boolean, default=True)
     repeat: Mapped[bool] = mapped_column(Boolean)
     repeat_wd: Mapped[Optional[List[int]]] = mapped_column(ARRAY(Integer), nullable=True)

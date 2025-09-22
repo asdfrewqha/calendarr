@@ -2,7 +2,7 @@ import json
 from typing import Any, Optional
 
 import redis.asyncio as redis
-from app.core.logging import get_logger
+from app.core.logging.logging import get_logger
 from app.core.settings import settings
 
 logger = get_logger()

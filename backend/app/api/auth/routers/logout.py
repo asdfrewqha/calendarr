@@ -1,19 +1,15 @@
-from typing import Annotated, Optional
+from typing import Annotated
 
-from app.database.models import User
-from app.dependencies.checks import check_user_token
+from app.api.auth.schemas import TokensTuple
 from app.dependencies.responses import okresponse
-from fastapi import APIRouter, Cookie, Depends, status
+from app.utils.cookies import get_tokens_cookies
+from fastapi import APIRouter, Depends, status
 
 router = APIRouter()
 
 
 @router.post("/logout", status_code=status.HTTP_200_OK)
-async def logout(
-    user: Annotated[User, Depends(check_user_token)],
-    access_token: Annotated[Optional[str], Cookie()] = None,
-    refresh_token: Annotated[Optional[str], Cookie()] = None,
-):
+async def logout(cookies: Annotated[TokensTuple, Depends(get_tokens_cookies)]):
     response = okresponse()
     response.delete_cookie("access_token")
     response.delete_cookie("refresh_token")

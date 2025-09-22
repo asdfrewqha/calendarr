@@ -1,7 +1,7 @@
 from contextlib import asynccontextmanager
 from typing import Any, AsyncGenerator, List
 
-from app.core.logging import get_logger
+from app.core.logging.logging import get_logger
 from app.core.settings import settings
 from app.database.models import Base
 from sqlalchemy import func, update

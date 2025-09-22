@@ -26,6 +26,10 @@ class MessageCreateScheme(BaseModel):
     start_send_time: Optional[time] = None
     end_send_date: Optional[date] = None
     end_send_time: Optional[time] = None
+    send_start: bool = True
+    send_end: Optional[bool] = None
+    start_schedule_id: Optional[UUID] = None
+    end_schedule_id: Optional[UUID] = None
     priority: int
     notification: bool = True
     repeat: bool = False
@@ -51,18 +55,25 @@ class MessageScheme(BaseModel):
     repeat: bool = False
     repeat_wd: Optional[list] = None
 
+    model_config = {"from_attributes": True}
+
 
 class MessageUpdateScheme(BaseModel):
     event: str = None
     id: Optional[UUID] = None
+    user_id: Optional[int] = None
     name: Optional[str] = None
     payload: Optional[dict] = None
-    start_send_date: date
-    type: MsgType
+    start_send_date: Optional[date] = None
+    type: Optional[MsgType] = None
     start_send_time: Optional[time] = None
     end_send_date: Optional[date] = None
     end_send_time: Optional[time] = None
-    priority: int
+    send_start: bool = True
+    send_end: Optional[bool] = None
+    start_schedule_id: Optional[UUID] = None
+    end_schedule_id: Optional[UUID] = None
+    priority: Optional[int] = None
     notification: bool = True
     repeat: bool = False
     repeat_wd: Optional[list] = None

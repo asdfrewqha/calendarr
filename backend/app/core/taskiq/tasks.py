@@ -1,8 +1,8 @@
 from typing import Annotated
 from uuid import UUID
 
-from app.core.broker import broker
-from app.core.logging import get_logger
+from app.core.logging.logging import get_logger
+from app.core.taskiq.broker import broker
 from app.database.adapter import adapter
 from app.database.models import Message
 from app.database.session import get_async_session

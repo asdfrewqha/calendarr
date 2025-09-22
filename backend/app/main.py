@@ -1,11 +1,11 @@
 # main.py
 from contextlib import asynccontextmanager
 
-from app.core.broker import broker
-from app.core.log_middleware import LoggingMiddleware
-from app.core.logging import setup_logging
+from app.core.logging.log_middleware import LoggingMiddleware
+from app.core.logging.logging import setup_logging
 from app.core.routers_loader import include_all_routers
 from app.core.settings import settings
+from app.core.taskiq.broker import broker
 from app.database.adapter import adapter
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware

@@ -2,26 +2,17 @@ from typing import Annotated
 from uuid import UUID
 
 from app.api.user.schemas import MessageScheme
-from app.database.adapter import adapter
-from app.database.models import Message, User
-from app.database.session import get_async_session
+from app.api.user.services import MessageService
 from app.dependencies.checks import check_user_token
-from app.dependencies.responses import emptyresponse
-from app.utils.redis_adapter import redis_adapter
 from fastapi import APIRouter, Depends
-from sqlalchemy.ext.asyncio import AsyncSession
 
 router = APIRouter()
 
 
 @router.delete("/message/{msg_id}", response_model=MessageScheme)
 async def list_message(
-    user: Annotated[User, Depends(check_user_token)],
-    session: Annotated[AsyncSession, Depends(get_async_session)],
+    user_id: Annotated[int, Depends(check_user_token)],
     msg_id: UUID,
+    service: Annotated[MessageService, Depends(MessageService)],
 ):
-    await adapter.delete(Message, msg_id, session)
-    await redis_adapter.publish(
-        f"messages:{user.id}", {"event": "message_deleted", "id": str(msg_id)}
-    )
-    return emptyresponse()
+    return await service.delete_message(msg_id=msg_id, user_id=user_id)

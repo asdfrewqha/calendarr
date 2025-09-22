@@ -1,39 +1,26 @@
-from typing import Annotated, Dict, Literal
+from typing import Annotated
 
-from app.core.logging import get_logger
-from app.database.adapter import adapter
-from app.database.models import User
-from app.database.session import get_async_session
+from app.api.auth.schemas import TokensTuple
+from app.core.logging.logging import get_logger
+from app.dependencies.redis_dependency import RedisDependency
 from app.utils.cookies import get_tokens_cookies
 from app.utils.token_manager import TokenManager
 from fastapi import Depends
 from fastapi.exceptions import HTTPException
-from sqlalchemy.ext.asyncio import AsyncSession
 
 logger = get_logger()
 
 
 async def check_user_token(
-    tokens: Annotated[Dict[Literal["access", "refresh"], str], Depends(get_tokens_cookies)],
-    session: Annotated[AsyncSession, Depends(get_async_session)],
-) -> User:
-    data = TokenManager.decode_token(tokens["access"])
-    user = await adapter.get_by_id(User, int(data["sub"]), session=session)
-    if user:
-        return user
-
-    logger.error("No user for this token")
-    raise HTTPException(401, "No user for this token")
-
-
-async def check_refresh(
-    tokens: Annotated[Dict[Literal["access", "refresh"], str], Depends(get_tokens_cookies)],
-    session: Annotated[AsyncSession, Depends(get_async_session)],
-) -> User:
-    data = TokenManager.decode_token(tokens["refresh"], access=False)
-    user = await adapter.get_by_id(User, int(data["sub"]), session=session)
-    if user:
-        return user
-
-    logger.error("No user for this token")
-    raise HTTPException(404, "No user for this token")
+    tokens: Annotated[TokensTuple, Depends(get_tokens_cookies)],
+    redis: Annotated[RedisDependency, Depends(RedisDependency)],
+) -> int:
+    async with redis.get_client() as client:
+        user_id = client.get(f"access_token:{tokens.access_token}")
+    if not user_id:
+        data = TokenManager.decode_token(tokens.access_token)
+        user_id = data.get("sub")
+        if not user_id:
+            logger.error("No user for this token")
+            raise HTTPException(401, "No user for this token")
+    return int(user_id)

@@ -1,24 +1,22 @@
 from typing import Annotated
 
-from app.core.logging import get_logger
-from app.database.models import User
-from app.dependencies.checks import check_refresh
-from app.utils.token_manager import TokenManager
-from fastapi import APIRouter, Depends, Response, status
+from app.api.auth.schemas import TokensTuple
+from app.api.auth.services import UserService
+from app.dependencies.responses import okresponse
+from app.utils.cookies import get_tokens_cookies
+from fastapi import APIRouter, Depends, status
 
-logger = get_logger()
 router = APIRouter()
 
 
 @router.get("/refresh", status_code=status.HTTP_200_OK)
-async def refresh(response: Response, user: Annotated[User, Depends(check_refresh)]):
-    access_token = TokenManager.create_token(
-        {"sub": int(user.id), "type": "access"},
-        TokenManager.ACCESS_TOKEN_EXPIRE_MINUTES,
-    )
-
+async def refresh(
+    service: Annotated[UserService, Depends(UserService)],
+    tokens: Annotated[TokensTuple, Depends(get_tokens_cookies)],
+):
+    response = okresponse()
+    access_token = await service.refresh(tokens)
     response.set_cookie(
         key="access_token", value=access_token, httponly=True, secure=True, samesite="None"
     )
-
-    return {"message": "Token refreshed successfully"}
+    return response

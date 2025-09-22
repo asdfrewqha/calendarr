@@ -2,7 +2,7 @@ import importlib
 import pkgutil
 
 import app.api as routers
-from app.core.logging import get_logger
+from app.core.logging.logging import get_logger
 from fastapi import FastAPI
 from fastapi.routing import APIRouter
 
