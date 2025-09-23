@@ -1,3 +1,4 @@
+import json
 from datetime import date, datetime, timezone
 from typing import Annotated, Optional
 from uuid import UUID, uuid4
@@ -142,7 +143,7 @@ class MessageService:
                         async with self.redis.get_client() as client:
                             await client.publish(
                                 f"messages:{user_id}",
-                                {"event": "message_deleted", "id": str(msg_id)},
+                                json.dumps({"event": "message_deleted", "id": str(msg_id)}),
                             )
                         return emptyresponse()
                     raise HTTPException(403)
