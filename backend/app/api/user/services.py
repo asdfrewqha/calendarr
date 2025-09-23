@@ -174,7 +174,7 @@ class MessageService:
                             )
                             start_datetime = datetime.combine(start_date, start_time, timezone.utc)
                             schedule1 = await send_telegram.schedule_by_time(
-                                source, start_datetime, msg_id, user.id
+                                source, start_datetime, msg_id, user_id
                             )
                             message_upd.start_schedule_id = schedule1
                         if message_upd.end_send_date or message_upd.end_send_time:
@@ -191,7 +191,7 @@ class MessageService:
                             )
                             end_datetime = datetime.combine(end_date, end_time, timezone.utc)
                             schedule2 = await send_telegram.schedule_by_time(
-                                source, end_datetime, msg_id, user.id
+                                source, end_datetime, msg_id, user_id
                             )
                             message_upd.end_schedule_id = schedule2
                         await session.execute(
