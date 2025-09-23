@@ -159,7 +159,6 @@ class MessageService:
                 message = message.scalar_one_or_none()
                 if message:
                     if message.user_id == user_id:
-                        message_upd.event = "message_updated"
                         if message_upd.start_send_date or message_upd.start_send_time:
                             await source.delete_schedule(message.start_schedule_id)
                             start_date = (
@@ -200,6 +199,7 @@ class MessageService:
                             .values(**message_upd.model_dump(exclude_none=True, exclude_unset=True))
                         )
                         await session.commit()
+                        message_upd.event = "message_updated"
                         async with self.redis.get_client() as client:
                             await client.publish(
                                 f"messages:{user_id}",
