@@ -38,10 +38,10 @@ class MessageService:
             user = await session.execute(select(self.user).where(self.user.id == user_id))
             if user.scalar_one_or_none():
                 message.user_id = user_id
+                message.id = uuid4()
                 start_send_datetime = datetime.combine(
                     message.start_send_date, message.start_send_time, timezone.utc
                 )
-                message.id = uuid4()
                 schedule1 = await send_telegram.schedule_by_time(
                     source, start_send_datetime, message.id, user_id
                 )

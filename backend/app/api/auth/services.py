@@ -41,7 +41,7 @@ class UserService:
         if not user_id:
             raise HTTPException(status_code=403, detail="Invalid initData")
         async with self.db.db_session() as session:
-            user = await session.execute(select(self.model).where(self.model.id == user_id))
+            user = await session.execute(select(self.model).where(self.model.id == int(user_id)))
             user = user.scalar_one_or_none()
             if not user:
                 raise HTTPException(status_code=404, detail="User not found")
@@ -60,7 +60,7 @@ class UserService:
         if not user_id:
             raise HTTPException(400, "Invalid token")
         async with self.db.db_session() as session:
-            user = await session.execute(select(self.model).where(self.model.id == user_id))
+            user = await session.execute(select(self.model).where(self.model.id == int(user_id)))
             user = user.scalar_one_or_none()
             if not user:
                 raise HTTPException(status_code=404, detail="User not found")
