@@ -175,7 +175,8 @@ class MessageService:
                             schedule1 = await send_telegram.schedule_by_time(
                                 source, start_datetime, msg_id, user_id
                             )
-                            message_upd.start_schedule_id = schedule1
+                            message_upd.start_schedule_id = schedule1.id
+                            message_upd.send_start = True
                         if message_upd.end_send_date or message_upd.end_send_time:
                             await source.delete_schedule(message.end_schedule_id)
                             end_date = (
@@ -192,7 +193,8 @@ class MessageService:
                             schedule2 = await send_telegram.schedule_by_time(
                                 source, end_datetime, msg_id, user_id
                             )
-                            message_upd.end_schedule_id = schedule2
+                            message_upd.end_schedule_id = schedule2.id
+                            message_upd.send_end = True
                         await session.execute(
                             update(self.message)
                             .where(self.message.id == msg_id)
